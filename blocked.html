@@ -355,13 +355,13 @@
       border-radius: 10px;
     }
 
-    .soundscape-row {
-      display: flex;
+    .soundscape-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
       gap: 8px;
     }
 
     .sound-chip {
-      flex: 1;
       padding: 9px 4px;
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid rgba(255, 255, 255, 0.1);
@@ -570,13 +570,18 @@
     <!-- Ambient Focus Soundscapes Card -->
     <div class="soundscapes-card" id="soundscapeCard">
       <div class="soundscape-header">
-        <span class="soundscape-title">🎧 Ambient Focus Soundscapes</span>
+        <span class="soundscape-title">🎧 Ambient Focus & Sleep Soundscapes</span>
         <span class="soundscape-status" id="audioStatus">Off</span>
       </div>
-      <div class="soundscape-row">
+      <div class="soundscape-grid">
         <button class="sound-chip" data-sound="rain">🌧️ Rain</button>
-        <button class="sound-chip" data-sound="whitenoise">📻 White Noise</button>
+        <button class="sound-chip" data-sound="thunder">⛈️ Storm</button>
+        <button class="sound-chip" data-sound="ocean">🌊 Ocean</button>
+        <button class="sound-chip" data-sound="forest">🌲 Forest</button>
+        <button class="sound-chip" data-sound="campfire">🕯️ Fire</button>
         <button class="sound-chip" data-sound="cafe">☕ Cafe</button>
+        <button class="sound-chip" data-sound="whitenoise">📻 Noise</button>
+        <button class="sound-chip" data-sound="brown">🌌 Sleep</button>
         <button class="sound-chip" data-sound="off">⏹ Off</button>
       </div>
       <div class="soundscape-volume-row">

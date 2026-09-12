@@ -4,7 +4,10 @@ let currentDomain = '';
 let activePresetMins = 25;
 let timerInterval = null;
 let audioContext = null;
-let activeSoundSource = null;
+let soundMasterGain = null;
+let soundVolumeLevel = 0.8;
+let soundTimerHandle = null;
+let activeAudioNodes = [];
 let isParentUnlocked = false;
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -365,27 +368,45 @@ function updateTimerTick() {
 }
 
 // ==========================================
-// 4. Ambient Focus Soundscapes (Web Audio Synth)
+// 4. Ambient Focus & Sleep Soundscapes (Web Audio Synth)
 // ==========================================
 function initSoundscapes() {
   const chips = document.querySelectorAll('.sound-chip');
   const statusLabel = document.getElementById('audioStatus');
+  const volumeSlider = document.getElementById('soundVolume');
 
   chips.forEach(chip => {
     chip.addEventListener('click', () => {
-      chips.forEach(c => c.classList.remove('active'));
       const soundType = chip.getAttribute('data-sound');
+      const isAlreadyActive = chip.classList.contains('active');
 
-      if (soundType === 'off') {
+      chips.forEach(c => c.classList.remove('active'));
+
+      if (soundType === 'off' || isAlreadyActive) {
         stopSound();
         statusLabel.textContent = 'Off';
+        statusLabel.style.color = 'var(--text-dim)';
+        const offChip = document.querySelector('.sound-chip[data-sound="off"]');
+        if (offChip) offChip.classList.add('active');
       } else {
         chip.classList.add('active');
         playSound(soundType);
         statusLabel.textContent = soundType.toUpperCase();
+        statusLabel.style.color = '#34d399';
       }
     });
   });
+
+  if (volumeSlider) {
+    volumeSlider.addEventListener('input', (e) => {
+      soundVolumeLevel = Number(e.target.value) / 100;
+      if (soundMasterGain && audioContext) {
+        soundMasterGain.gain.setValueAtTime(soundVolumeLevel, audioContext.currentTime);
+      }
+    });
+  }
+
+  window.addEventListener('beforeunload', stopSound);
 }
 
 function playSound(type) {
@@ -393,56 +414,304 @@ function playSound(type) {
 
   try {
     audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    const bufferSize = audioContext.sampleRate * 2;
-    const noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
-    const output = noiseBuffer.getChannelData(0);
+    soundMasterGain = audioContext.createGain();
+    soundMasterGain.gain.setValueAtTime(soundVolumeLevel, audioContext.currentTime);
+    soundMasterGain.connect(audioContext.destination);
 
-    for (let i = 0; i < bufferSize; i++) {
-      output[i] = Math.random() * 2 - 1;
-    }
-
-    const whiteNoise = audioContext.createBufferSource();
-    whiteNoise.buffer = noiseBuffer;
-    whiteNoise.loop = true;
-
-    const filter = audioContext.createBiquadFilter();
-    const gainNode = audioContext.createGain();
+    const sampleRate = audioContext.sampleRate;
+    const createNoiseBuffer = (seconds = 2, transform = null) => {
+      const bufferSize = sampleRate * seconds;
+      const buffer = audioContext.createBuffer(1, bufferSize, sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = transform ? transform(i, bufferSize) : (Math.random() * 2 - 1);
+      }
+      return buffer;
+    };
 
     if (type === 'rain') {
+      // 🌧️ Gentle Rainfall
+      const noise = audioContext.createBufferSource();
+      noise.buffer = createNoiseBuffer(2);
+      noise.loop = true;
+      const filter = audioContext.createBiquadFilter();
       filter.type = 'lowpass';
       filter.frequency.setValueAtTime(800, audioContext.currentTime);
-      gainNode.gain.setValueAtTime(0.18, audioContext.currentTime);
-    } else if (type === 'cafe') {
-      filter.type = 'bandpass';
-      filter.frequency.setValueAtTime(400, audioContext.currentTime);
-      filter.Q.setValueAtTime(1.5, audioContext.currentTime);
-      gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
-    } else { // white noise
-      filter.type = 'lowpass';
-      filter.frequency.setValueAtTime(3000, audioContext.currentTime);
-      gainNode.gain.setValueAtTime(0.08, audioContext.currentTime);
+      const gain = audioContext.createGain();
+      gain.gain.setValueAtTime(0.18, audioContext.currentTime);
+
+      noise.connect(filter);
+      filter.connect(gain);
+      gain.connect(soundMasterGain);
+      noise.start(0);
+      activeAudioNodes.push(noise, filter, gain);
+    } 
+    else if (type === 'thunder') {
+      // ⛈️ Rain + Rolling Thunderstorm
+      // 1. Steady rain background
+      const rainNoise = audioContext.createBufferSource();
+      rainNoise.buffer = createNoiseBuffer(2);
+      rainNoise.loop = true;
+      const rainFilter = audioContext.createBiquadFilter();
+      rainFilter.type = 'lowpass';
+      rainFilter.frequency.setValueAtTime(750, audioContext.currentTime);
+      const rainGain = audioContext.createGain();
+      rainGain.gain.setValueAtTime(0.15, audioContext.currentTime);
+
+      rainNoise.connect(rainFilter);
+      rainFilter.connect(rainGain);
+      rainGain.connect(soundMasterGain);
+      rainNoise.start(0);
+      activeAudioNodes.push(rainNoise, rainFilter, rainGain);
+
+      // 2. Thunder sub-bass & deep rumble generator
+      const thunderNoise = audioContext.createBufferSource();
+      thunderNoise.buffer = createNoiseBuffer(4);
+      thunderNoise.loop = true;
+      const thunderFilter = audioContext.createBiquadFilter();
+      thunderFilter.type = 'lowpass';
+      thunderFilter.frequency.setValueAtTime(110, audioContext.currentTime);
+      thunderFilter.Q.setValueAtTime(2.2, audioContext.currentTime);
+
+      const thunderGain = audioContext.createGain();
+      thunderGain.gain.setValueAtTime(0.001, audioContext.currentTime);
+
+      const subOsc = audioContext.createOscillator();
+      subOsc.type = 'sine';
+      subOsc.frequency.setValueAtTime(48, audioContext.currentTime);
+      const subGain = audioContext.createGain();
+      subGain.gain.setValueAtTime(0.001, audioContext.currentTime);
+
+      thunderNoise.connect(thunderFilter);
+      thunderFilter.connect(thunderGain);
+      thunderGain.connect(soundMasterGain);
+
+      subOsc.connect(subGain);
+      subGain.connect(soundMasterGain);
+
+      thunderNoise.start(0);
+      subOsc.start(0);
+      activeAudioNodes.push(thunderNoise, thunderFilter, thunderGain, subOsc, subGain);
+
+      const triggerThunderRoll = () => {
+        if (!audioContext || audioContext.state === 'closed') return;
+        const now = audioContext.currentTime;
+        const duration = 3.5 + Math.random() * 2.5;
+        const peakVol = 0.30 + Math.random() * 0.15;
+
+        thunderGain.gain.cancelScheduledValues(now);
+        thunderGain.gain.setValueAtTime(0.001, now);
+        thunderGain.gain.linearRampToValueAtTime(peakVol, now + 1.1);
+        thunderGain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+        subGain.gain.cancelScheduledValues(now);
+        subGain.gain.setValueAtTime(0.001, now);
+        subGain.gain.linearRampToValueAtTime(peakVol * 0.75, now + 0.9);
+        subGain.gain.exponentialRampToValueAtTime(0.001, now + duration - 0.5);
+
+        subOsc.frequency.cancelScheduledValues(now);
+        subOsc.frequency.setValueAtTime(56, now);
+        subOsc.frequency.exponentialRampToValueAtTime(38, now + duration);
+      };
+
+      setTimeout(triggerThunderRoll, 1000);
+      soundTimerHandle = setInterval(triggerThunderRoll, 9000 + Math.random() * 5000);
     }
+    else if (type === 'ocean') {
+      // 🌊 Rhythmic Ocean Waves
+      const noise = audioContext.createBufferSource();
+      noise.buffer = createNoiseBuffer(3);
+      noise.loop = true;
 
-    whiteNoise.connect(filter);
-    filter.connect(gainNode);
-    gainNode.connect(audioContext.destination);
+      const filter = audioContext.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(450, audioContext.currentTime);
 
-    whiteNoise.start(0);
-    activeSoundSource = whiteNoise;
+      const waveGain = audioContext.createGain();
+      waveGain.gain.setValueAtTime(0.12, audioContext.currentTime);
+
+      const lfo = audioContext.createOscillator();
+      lfo.frequency.setValueAtTime(0.13, audioContext.currentTime);
+      const lfoGain = audioContext.createGain();
+      lfoGain.gain.setValueAtTime(0.09, audioContext.currentTime);
+
+      lfo.connect(lfoGain);
+      lfoGain.connect(waveGain.gain);
+
+      noise.connect(filter);
+      filter.connect(waveGain);
+      waveGain.connect(soundMasterGain);
+
+      noise.start(0);
+      lfo.start(0);
+      activeAudioNodes.push(noise, filter, waveGain, lfo, lfoGain);
+    }
+    else if (type === 'forest') {
+      // 🌲 Forest Wind & Gentle Bird Chirps
+      const noise = audioContext.createBufferSource();
+      noise.buffer = createNoiseBuffer(3);
+      noise.loop = true;
+
+      const bandFilter = audioContext.createBiquadFilter();
+      bandFilter.type = 'bandpass';
+      bandFilter.frequency.setValueAtTime(820, audioContext.currentTime);
+      bandFilter.Q.setValueAtTime(1.2, audioContext.currentTime);
+
+      const windGain = audioContext.createGain();
+      windGain.gain.setValueAtTime(0.12, audioContext.currentTime);
+
+      const windLfo = audioContext.createOscillator();
+      windLfo.frequency.setValueAtTime(0.2, audioContext.currentTime);
+      const windLfoGain = audioContext.createGain();
+      windLfoGain.gain.setValueAtTime(0.06, audioContext.currentTime);
+      windLfo.connect(windLfoGain);
+      windLfoGain.connect(windGain.gain);
+
+      noise.connect(bandFilter);
+      bandFilter.connect(windGain);
+      windGain.connect(soundMasterGain);
+
+      noise.start(0);
+      windLfo.start(0);
+      activeAudioNodes.push(noise, bandFilter, windGain, windLfo, windLfoGain);
+
+      const chirpBird = () => {
+        if (!audioContext || audioContext.state === 'closed') return;
+        try {
+          const chirpOsc = audioContext.createOscillator();
+          const chirpGain = audioContext.createGain();
+          const now = audioContext.currentTime;
+          const startFreq = 2600 + Math.random() * 600;
+          chirpOsc.type = 'sine';
+          chirpOsc.frequency.setValueAtTime(startFreq, now);
+          chirpOsc.frequency.exponentialRampToValueAtTime(startFreq + 500, now + 0.12);
+          chirpOsc.frequency.exponentialRampToValueAtTime(startFreq - 200, now + 0.24);
+
+          chirpGain.gain.setValueAtTime(0.001, now);
+          chirpGain.gain.linearRampToValueAtTime(0.035, now + 0.05);
+          chirpGain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+
+          chirpOsc.connect(chirpGain);
+          chirpGain.connect(soundMasterGain);
+          chirpOsc.start(now);
+          chirpOsc.stop(now + 0.3);
+        } catch (e) {}
+      };
+      soundTimerHandle = setInterval(chirpBird, 5500 + Math.random() * 4000);
+    }
+    else if (type === 'campfire') {
+      // 🕯️ Cozy Fireplace with Crackles
+      const baseNoise = audioContext.createBufferSource();
+      baseNoise.buffer = createNoiseBuffer(2);
+      baseNoise.loop = true;
+      const baseFilter = audioContext.createBiquadFilter();
+      baseFilter.type = 'lowpass';
+      baseFilter.frequency.setValueAtTime(260, audioContext.currentTime);
+      const baseGain = audioContext.createGain();
+      baseGain.gain.setValueAtTime(0.14, audioContext.currentTime);
+
+      baseNoise.connect(baseFilter);
+      baseFilter.connect(baseGain);
+      baseGain.connect(soundMasterGain);
+      baseNoise.start(0);
+      activeAudioNodes.push(baseNoise, baseFilter, baseGain);
+
+      const crackleBuffer = createNoiseBuffer(3, () => {
+        return Math.random() < 0.0025 ? (Math.random() * 2 - 1) : (Math.random() * 0.02 - 0.01);
+      });
+      const crackleSource = audioContext.createBufferSource();
+      crackleSource.buffer = crackleBuffer;
+      crackleSource.loop = true;
+      const crackleFilter = audioContext.createBiquadFilter();
+      crackleFilter.type = 'bandpass';
+      crackleFilter.frequency.setValueAtTime(1600, audioContext.currentTime);
+      crackleFilter.Q.setValueAtTime(2.0, audioContext.currentTime);
+      const crackleGain = audioContext.createGain();
+      crackleGain.gain.setValueAtTime(0.20, audioContext.currentTime);
+
+      crackleSource.connect(crackleFilter);
+      crackleFilter.connect(crackleGain);
+      crackleGain.connect(soundMasterGain);
+      crackleSource.start(0);
+      activeAudioNodes.push(crackleSource, crackleFilter, crackleGain);
+    }
+    else if (type === 'cafe') {
+      // ☕ Warm Cafe Ambiance
+      const noise = audioContext.createBufferSource();
+      noise.buffer = createNoiseBuffer(2);
+      noise.loop = true;
+      const filter = audioContext.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(420, audioContext.currentTime);
+      filter.Q.setValueAtTime(1.5, audioContext.currentTime);
+      const gain = audioContext.createGain();
+      gain.gain.setValueAtTime(0.20, audioContext.currentTime);
+
+      noise.connect(filter);
+      filter.connect(gain);
+      gain.connect(soundMasterGain);
+      noise.start(0);
+      activeAudioNodes.push(noise, filter, gain);
+    }
+    else if (type === 'brown') {
+      // 🌌 Deep Sleep & Alpha-Wave Brown Noise
+      const noise = audioContext.createBufferSource();
+      noise.buffer = createNoiseBuffer(2);
+      noise.loop = true;
+      const filter1 = audioContext.createBiquadFilter();
+      filter1.type = 'lowpass';
+      filter1.frequency.setValueAtTime(200, audioContext.currentTime);
+      const filter2 = audioContext.createBiquadFilter();
+      filter2.type = 'lowpass';
+      filter2.frequency.setValueAtTime(200, audioContext.currentTime);
+      const gain = audioContext.createGain();
+      gain.gain.setValueAtTime(0.28, audioContext.currentTime);
+
+      noise.connect(filter1);
+      filter1.connect(filter2);
+      filter2.connect(gain);
+      gain.connect(soundMasterGain);
+      noise.start(0);
+      activeAudioNodes.push(noise, filter1, filter2, gain);
+    }
+    else {
+      // 📻 Standard White Noise
+      const noise = audioContext.createBufferSource();
+      noise.buffer = createNoiseBuffer(2);
+      noise.loop = true;
+      const filter = audioContext.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(3200, audioContext.currentTime);
+      const gain = audioContext.createGain();
+      gain.gain.setValueAtTime(0.08, audioContext.currentTime);
+
+      noise.connect(filter);
+      filter.connect(gain);
+      gain.connect(soundMasterGain);
+      noise.start(0);
+      activeAudioNodes.push(noise, filter, gain);
+    }
   } catch (err) {
     console.warn('Audio synthesis error:', err);
   }
 }
 
 function stopSound() {
-  if (activeSoundSource) {
-    try { activeSoundSource.stop(); } catch (e) {}
-    activeSoundSource = null;
+  if (soundTimerHandle) {
+    clearInterval(soundTimerHandle);
+    soundTimerHandle = null;
   }
+  activeAudioNodes.forEach(node => {
+    try { if (node.stop) node.stop(); } catch (e) {}
+    try { if (node.disconnect) node.disconnect(); } catch (e) {}
+  });
+  activeAudioNodes = [];
+
   if (audioContext) {
     try { audioContext.close(); } catch (e) {}
     audioContext = null;
   }
+  soundMasterGain = null;
 }
 
 // ==========================================

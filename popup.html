@@ -465,15 +465,15 @@
     }
 
     /* Soundscapes Box */
-    .soundscape-row {
-      display: flex;
+    .soundscape-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
       gap: 6px;
       margin-top: 10px;
     }
 
     .sound-chip {
-      flex: 1;
-      padding: 7px 4px;
+      padding: 8px 4px;
       background: rgba(255, 255, 255, 0.04);
       border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 10px;
@@ -483,12 +483,23 @@
       cursor: pointer;
       text-align: center;
       transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .sound-chip:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-main);
+      border-color: rgba(255, 255, 255, 0.18);
     }
 
     .sound-chip.active {
       background: rgba(16, 185, 129, 0.15);
       border-color: rgba(16, 185, 129, 0.4);
       color: #34d399;
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
     }
 
     /* Toggle switches */
@@ -891,14 +902,23 @@
       <!-- Ambient Soundscapes -->
       <div class="glass-card">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-          <span class="current-site-title">🎧 Ambient Focus Soundscapes</span>
+          <span class="current-site-title">🎧 Ambient Focus & Sleep Soundscapes</span>
           <span style="font-size: 11px; color: var(--text-dim);" id="audioStatus">Off</span>
         </div>
-        <div class="soundscape-row">
+        <div class="soundscape-grid">
           <button class="sound-chip" data-sound="rain">🌧️ Rain</button>
-          <button class="sound-chip" data-sound="whitenoise">📻 White Noise</button>
+          <button class="sound-chip" data-sound="thunder">⛈️ Storm</button>
+          <button class="sound-chip" data-sound="ocean">🌊 Ocean</button>
+          <button class="sound-chip" data-sound="forest">🌲 Forest</button>
+          <button class="sound-chip" data-sound="campfire">🕯️ Fire</button>
           <button class="sound-chip" data-sound="cafe">☕ Cafe</button>
+          <button class="sound-chip" data-sound="whitenoise">📻 Noise</button>
+          <button class="sound-chip" data-sound="brown">🌌 Sleep</button>
           <button class="sound-chip" data-sound="off">⏹ Off</button>
+        </div>
+        <div class="soundscape-volume-row" style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255, 255, 255, 0.05);">
+          <span style="font-size: 11px; color: var(--text-muted);">🔈 Volume</span>
+          <input type="range" id="soundVolume" min="0" max="100" value="80" style="flex: 1; height: 4px; accent-color: #10b981; background: rgba(255, 255, 255, 0.1); border-radius: 999px;">
         </div>
       </div>
     </div>
