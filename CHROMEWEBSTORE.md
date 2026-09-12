@@ -13,9 +13,9 @@
 StudyShield - Stay Productive, Stay Safe
 ```
 
-**Short Description** (128 / 132 characters)
+**Short Description** (110 / 132 characters)
 ```
-Smart website blocker, Pomodoro focus timer with ambient soundscapes, study streaks, and tamper-proof parental controls.
+Smart website blocker, Pomodoro focus timer with ambient soundscapes, study streaks, adult content protection.
 ```
 
 **Detailed Description**

@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "StudyShield - Stay Productive, Stay Safe",
   "version": "2.1",
-  "description": "Smart website blocker, Pomodoro focus timer with ambient soundscapes, study streaks, adult content protection, and tamper-proof parental controls.",
+  "description": "Smart website blocker, Pomodoro focus timer with ambient soundscapes, study streaks, adult content protection.",
   "permissions": [
     "storage",
     "tabs",
