@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      width: 420px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #333;
+    }
+    
+    .header {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 24px 24px 20px;
+      text-align: center;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+    
+    .header h1 {
+      font-size: 24px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 6px;
+    }
+    
+    .header p {
+      font-size: 13px;
+      color: #666;
+      font-weight: 500;
+    }
+    
+    .content {
+      background: #f8f9fa;
+      max-height: 500px;
+      overflow-y: auto;
+      padding-bottom: 10px;
+    }
+    
+    .content::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    .content::-webkit-scrollbar-track {
+      background: #e9ecef;
+    }
+    
+    .content::-webkit-scrollbar-thumb {
+      background: #cbd5e0;
+      border-radius: 4px;
+    }
+    
+    .content::-webkit-scrollbar-thumb:hover {
+      background: #a0aec0;
+    }
+    
+    /* Current Website Card */
+    .current-website {
+      background: white;
+      margin: 16px;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      border: 2px solid #e9ecef;
+    }
+    
+    .current-website h3 {
+      font-size: 14px;
+      font-weight: 600;
+      color: #495057;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .website-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: #f8f9fa;
+      border-radius: 12px;
+      margin-bottom: 14px;
+    }
+    
+    .website-icon {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      font-size: 16px;
+    }
+    
+    .website-name {
+      flex: 1;
+      font-size: 14px;
+      font-weight: 600;
+      color: #212529;
+      word-break: break-all;
+    }
+    
+    .quick-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    
+    .quick-btn {
+      padding: 10px 16px;
+      border-radius: 10px;
+      border: 2px solid;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    
+    .quick-btn.allow {
+      background: #d4f8e8;
+      border-color: #10b981;
+      color: #047857;
+    }
+    
+    .quick-btn.allow:hover {
+      background: #10b981;
+      color: white;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+    
+    .quick-btn.block {
+      background: #ffe4e6;
+      border-color: #ef4444;
+      color: #dc2626;
+    }
+    
+    .quick-btn.block:hover {
+      background: #ef4444;
+      color: white;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    }
+    
+    .quick-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+    
+    /* Timer Section */
+    .timer-section {
+      background: white;
+      margin: 16px;
+      padding: 24px;
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    
+    .section-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #495057;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .timer-display {
+      font-size: 56px;
+      text-align: center;
+      font-weight: 700;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 20px 0;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 2px;
+    }
+    
+    .timer-controls {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    
+    .timer-input {
+      flex: 1;
+      padding: 12px 16px;
+      border: 2px solid #e9ecef;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      transition: all 0.2s;
+      background: #f8f9fa;
+    }
+    
+    .timer-input:focus {
+      outline: none;
+      border-color: #667eea;
+      background: white;
+    }
+    
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      flex: 1;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-danger {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      color: white;
+    }
+    
+    .btn-danger:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+    }
+    
+    .btn-small {
+      padding: 8px 16px;
+      font-size: 13px;
+    }
+    
+    .btn-secondary {
+      background: white;
+      color: #495057;
+      border: 2px solid #e9ecef;
+    }
+    
+    .btn-secondary:hover {
+      background: #f8f9fa;
+      border-color: #667eea;
+      color: #667eea;
+    }
+    
+    /* Toggle Switch */
+    .toggle-card {
+      background: white;
+      margin: 16px;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    
+    .toggle-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .toggle-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      color: #212529;
+    }
+    
+    .toggle-label-icon {
+      font-size: 20px;
+    }
+    
+    .toggle-desc {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid #e9ecef;
+      font-size: 12px;
+      color: #6c757d;
+      line-height: 1.5;
+    }
+    
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 56px;
+      height: 32px;
+    }
+    
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #e9ecef;
+      transition: 0.3s;
+      border-radius: 32px;
+    }
+    
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 24px;
+      width: 24px;
+      left: 4px;
+      bottom: 4px;
+      background: white;
+      transition: 0.3s;
+      border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    input:checked + .slider {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    input:checked + .slider:before {
+      transform: translateX(24px);
+    }
+    
+    /* List Sections */
+    .list-card {
+      background: white;
+      margin: 16px;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    
+    .list-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    
+    .badge {
+      background: #e9ecef;
+      color: #495057;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    
+    .input-group {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    
+    .input-field {
+      flex: 1;
+      padding: 10px 14px;
+      border: 2px solid #e9ecef;
+      border-radius: 10px;
+      font-size: 14px;
+      transition: all 0.2s;
+      background: #f8f9fa;
+    }
+    
+    .input-field:focus {
+      outline: none;
+      border-color: #667eea;
+      background: white;
+    }
+    
+    .input-field::placeholder {
+      color: #adb5bd;
+    }
+    
+    .list-items {
+      max-height: 160px;
+      overflow-y: auto;
+      margin-top: 12px;
+    }
+    
+    .list-items::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    .list-items::-webkit-scrollbar-track {
+      background: #f8f9fa;
+      border-radius: 3px;
+    }
+    
+    .list-items::-webkit-scrollbar-thumb {
+      background: #cbd5e0;
+      border-radius: 3px;
+    }
+    
+    .list-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 14px;
+      background: #f8f9fa;
+      margin-bottom: 8px;
+      border-radius: 10px;
+      transition: all 0.2s;
+      border: 2px solid transparent;
+    }
+    
+    .list-item:hover {
+      background: #e9ecef;
+      border-color: #667eea;
+    }
+    
+    .list-item:last-child {
+      margin-bottom: 0;
+    }
+    
+    .item-text {
+      flex: 1;
+      font-size: 13px;
+      font-weight: 500;
+      color: #495057;
+      word-break: break-all;
+    }
+    
+    .item-buttons {
+      display: flex;
+      gap: 6px;
+    }
+    
+    .icon-btn {
+      width: 32px;
+      height: 32px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+    
+    .icon-btn.edit {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+    
+    .icon-btn.edit:hover {
+      background: #3b82f6;
+      color: white;
+      transform: scale(1.1);
+    }
+    
+    .icon-btn.delete {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+    
+    .icon-btn.delete:hover {
+      background: #ef4444;
+      color: white;
+      transform: scale(1.1);
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 32px 16px;
+      color: #868e96;
+      font-size: 13px;
+    }
+    
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+      opacity: 0.5;
+    }
+    
+    /* Status Toast */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: white;
+      padding: 14px 20px;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      font-size: 14px;
+      font-weight: 600;
+      transition: transform 0.3s;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 250px;
+    }
+    
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+    
+    .toast.success {
+      border-left: 4px solid #10b981;
+      color: #047857;
+    }
+    
+    .toast.error {
+      border-left: 4px solid #ef4444;
+      color: #dc2626;
+    }
+    
+    .toast-icon {
+      font-size: 20px;
+    }
+    
+    /* Modal for prelisted sites */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 2000;
+      animation: fadeIn 0.3s;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    .modal.show {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .modal-content {
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      max-width: 500px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      animation: slideUp 0.3s;
+    }
+    
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .modal-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #212529;
+    }
+    
+    .modal-close {
+      width: 36px;
+      height: 36px;
+      border: none;
+      background: #f8f9fa;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    
+    .modal-close:hover {
+      background: #e9ecef;
+      transform: rotate(90deg);
+    }
+    
+    .category-section {
+      margin-bottom: 24px;
+    }
+    
+    .category-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #495057;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .site-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+    
+    .site-tag {
+      background: #f8f9fa;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      color: #495057;
+      border: 1px solid #e9ecef;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🎯 Focus Timer</h1>
+    <p>Stay focused, stay productive</p>
+  </div>
+  
+  <div class="content">
+    <!-- Current Website -->
+    <div class="current-website" id="currentWebsiteCard">
+      <h3><span>🌐</span> Current Website</h3>
+      <div class="website-info">
+        <div class="website-icon" id="websiteIcon">?</div>
+        <div class="website-name" id="websiteName">Loading...</div>
+      </div>
+      <div class="quick-actions">
+        <button class="quick-btn allow" id="quickAllow">
+          <span>✓</span> Allow
+        </button>
+        <button class="quick-btn block" id="quickBlock">
+          <span>✕</span> Block
+        </button>
+      </div>
+    </div>
+    
+    <!-- Timer Section -->
+    <div class="timer-section">
+      <h3 class="section-title"><span>⏱️</span> Focus Timer</h3>
+      <div class="timer-display" id="timerDisplay">25:00</div>
+      <div class="timer-controls">
+        <input type="number" id="timerDuration" class="timer-input" min="1" max="180" value="25" placeholder="Minutes">
+        <button class="btn btn-primary" id="startTimer">
+          <span>▶</span> Start
+        </button>
+      </div>
+      <button class="btn btn-danger" id="stopTimer" style="width: 100%;">
+        <span>⏹</span> Stop Timer
+      </button>
+    </div>
+    
+    <!-- Focus Mode Toggle -->
+    <div class="toggle-card">
+      <div class="toggle-row">
+        <div class="toggle-label">
+          <span class="toggle-label-icon">🔒</span>
+          <span>Focus Mode</span>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="focusModeToggle">
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+    
+    <!-- Prelisted Sites Toggle -->
+    <div class="toggle-card">
+      <div class="toggle-row">
+        <div class="toggle-label">
+          <span class="toggle-label-icon">📋</span>
+          <span>Block Distracting Sites</span>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="prelistedToggle">
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="toggle-desc">
+        <strong>Blocks 60+ distracting sites:</strong> Social networks, video streaming, gaming portals, shopping sites, dating apps, and more.
+      </div>
+    </div>
+    
+    <!-- View Prelisted Sites Button -->
+    <div style="margin: 16px; margin-top: 0;">
+      <button id="viewPrelistedBtn" class="btn btn-secondary" style="width: 100%; padding: 12px;">
+        <span>📝</span> View All Blocked Sites
+      </button>
+    </div>
+    
+    <!-- Allowed Websites -->
+    <div class="list-card">
+      <div class="list-header">
+        <h3 class="section-title" style="margin: 0;"><span>✅</span> Allowed Sites</h3>
+        <span class="badge" id="allowedCount">0</span>
+      </div>
+      <div class="input-group">
+        <input type="text" id="allowedInput" class="input-field" placeholder="example.com">
+        <button class="btn btn-primary btn-small" id="addAllowed">Add</button>
+      </div>
+      <div class="list-items" id="allowedList"></div>
+    </div>
+    
+    <!-- Blocked Websites -->
+    <div class="list-card">
+      <div class="list-header">
+        <h3 class="section-title" style="margin: 0;"><span>🚫</span> Blocked Sites</h3>
+        <span class="badge" id="blockedCount">0</span>
+      </div>
+      <div class="input-group">
+        <input type="text" id="blockedInput" class="input-field" placeholder="example.com">
+        <button class="btn btn-primary btn-small" id="addBlocked">Add</button>
+      </div>
+      <div class="list-items" id="blockedList"></div>
+    </div>
+    
+    <!-- Blocked Keywords -->
+    <div class="list-card">
+      <div class="list-header">
+        <h3 class="section-title" style="margin: 0;"><span>🔍</span> Blocked Keywords</h3>
+        <span class="badge" id="keywordCount">0</span>
+      </div>
+      <div class="input-group">
+        <input type="text" id="keywordInput" class="input-field" placeholder="keyword">
+        <button class="btn btn-primary btn-small" id="addKeyword">Add</button>
+      </div>
+      <div class="list-items" id="keywordList"></div>
+    </div>
+  </div>
+  
+  <div class="toast" id="toast">
+    <span class="toast-icon" id="toastIcon"></span>
+    <span id="toastMessage"></span>
+  </div>
+  
+  <!-- Prelisted Sites Modal -->
+  <div class="modal" id="prelistedModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">📋 Prelisted Blocked Sites</h2>
+        <button class="modal-close" id="closeModal">✕</button>
+      </div>
+      
+      <div class="category-section">
+        <div class="category-title">📱 Social Networks (10 sites)</div>
+        <div class="site-grid">
+          <div class="site-tag">Social Site #1</div>
+          <div class="site-tag">Social Site #2</div>
+          <div class="site-tag">Social Site #3</div>
+          <div class="site-tag">Social Site #4</div>
+          <div class="site-tag">Social Site #5</div>
+          <div class="site-tag">Social Site #6</div>
+          <div class="site-tag">Social Site #7</div>
+          <div class="site-tag">Social Site #8</div>
+          <div class="site-tag">Social Site #9</div>
+          <div class="site-tag">Social Site #10</div>
+        </div>
+      </div>
+      
+      <div class="category-section">
+        <div class="category-title">🎬 Video Streaming (9 sites)</div>
+        <div class="site-grid">
+          <div class="site-tag">Video Site #1</div>
+          <div class="site-tag">Video Site #2</div>
+          <div class="site-tag">Video Site #3</div>
+          <div class="site-tag">Video Site #4</div>
+          <div class="site-tag">Video Site #5</div>
+          <div class="site-tag">Video Site #6</div>
+          <div class="site-tag">Video Site #7</div>
+          <div class="site-tag">Video Site #8</div>
+          <div class="site-tag">Video Site #9</div>
+        </div>
+      </div>
+      
+      <div class="category-section">
+        <div class="category-title">🎮 Gaming (9 sites)</div>
+        <div class="site-grid">
+          <div class="site-tag">Gaming Site #1</div>
+          <div class="site-tag">Gaming Site #2</div>
+          <div class="site-tag">Gaming Site #3</div>
+          <div class="site-tag">Gaming Site #4</div>
+          <div class="site-tag">Gaming Site #5</div>
+          <div class="site-tag">Gaming Site #6</div>
+          <div class="site-tag">Gaming Site #7</div>
+          <div class="site-tag">Gaming Site #8</div>
+          <div class="site-tag">Gaming Site #9</div>
+        </div>
+      </div>
+      
+      <div class="category-section">
+        <div class="category-title">📰 News & Entertainment (9 sites)</div>
+        <div class="site-grid">
+          <div class="site-tag">News Site #1</div>
+          <div class="site-tag">News Site #2</div>
+          <div class="site-tag">News Site #3</div>
+          <div class="site-tag">News Site #4</div>
+          <div class="site-tag">News Site #5</div>
+          <div class="site-tag">News Site #6</div>
+          <div class="site-tag">News Site #7</div>
+          <div class="site-tag">News Site #8</div>
+          <div class="site-tag">News Site #9</div>
+        </div>
+      </div>
+      
+      <div class="category-section">
+        <div class="category-title">🛒 Shopping (8 sites)</div>
+        <div class="site-grid">
+          <div class="site-tag">Shopping Site #1</div>
+          <div class="site-tag">Shopping Site #2</div>
+          <div class="site-tag">Shopping Site #3</div>
+          <div class="site-tag">Shopping Site #4</div>
+          <div class="site-tag">Shopping Site #5</div>
+          <div class="site-tag">Shopping Site #6</div>
+          <div class="site-tag">Shopping Site #7</div>
+          <div class="site-tag">Shopping Site #8</div>
+        </div>
+      </div>
+      
+      <div class="category-section">
+        <div class="category-title">💕 Dating (5 sites)</div>
+        <div class="site-grid">
+          <div class="site-tag">Dating Site #1</div>
+          <div class="site-tag">Dating Site #2</div>
+          <div class="site-tag">Dating Site #3</div>
+          <div class="site-tag">Dating Site #4</div>
+          <div class="site-tag">Dating Site #5</div>
+        </div>
+      </div>
+      
+      <div class="category-section">
+        <div class="category-title">💬 Forums & Communities (4 sites)</div>
+        <div class="site-grid">
+          <div class="site-tag">Forum Site #1</div>
+          <div class="site-tag">Forum Site #2</div>
+          <div class="site-tag">Forum Site #3</div>
+          <div class="site-tag">Forum Site #4</div>
+        </div>
+      </div>
+      
+      <div style="background: #e7f3ff; padding: 16px; border-radius: 12px; margin-top: 20px; font-size: 13px; color: #0c5aa6; line-height: 1.6;">
+        <strong>💡 Note:</strong> Toggle "Block Distracting Sites" to enable/disable all these sites at once. Sites include popular social networks, streaming services, and time-wasting platforms. You can still add custom sites to your permanent block list.
+      </div>
+    </div>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>
