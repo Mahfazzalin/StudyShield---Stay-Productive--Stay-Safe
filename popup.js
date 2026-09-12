@@ -471,6 +471,11 @@ async function loadSettings() {
 
   // Listeners for toggles
   document.getElementById('adultShieldToggle').onchange = (e) => {
+    if (!isParentUnlocked) {
+      e.target.checked = true;
+      showToast('🔒 Parent PIN required to change Adult Filter');
+      return;
+    }
     chrome.storage.local.set({ adultShieldEnabled: e.target.checked });
     chrome.runtime.sendMessage({ action: 'syncRules' });
     showToast(e.target.checked ? 'Adult Filter Enabled' : 'Adult Filter Disabled');

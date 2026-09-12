@@ -906,20 +906,6 @@
     <!-- TAB 3: SHIELD & RULES -->
     <div class="tab-pane" id="tab-shield">
       <div class="glass-card">
-        <!-- Adult Content Shield Toggle -->
-        <div class="toggle-row">
-          <div class="toggle-info">
-            <div class="toggle-title">
-              <span>🔞 Adult & Harmful Filter</span>
-            </div>
-            <div class="toggle-desc">Blocks 100+ adult domains, explicit content, and searches.</div>
-          </div>
-          <label class="switch">
-            <input type="checkbox" id="adultShieldToggle" checked>
-            <span class="slider"></span>
-          </label>
-        </div>
-
         <!-- Distracting Sites Blocker Toggle -->
         <div class="toggle-row">
           <div class="toggle-info">
@@ -946,6 +932,18 @@
             <input type="checkbox" id="focusModeToggle">
             <span class="slider"></span>
           </label>
+        </div>
+
+        <!-- Notice: Adult & Harmful Filter Controlled in Parent Controls -->
+        <div style="padding: 10px 12px; background: rgba(99, 102, 241, 0.06); border-radius: 12px; display: flex; align-items: center; justify-content: space-between; border: 1px dashed rgba(99, 102, 241, 0.2); margin-top: 10px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 15px;">🔞</span>
+            <div>
+              <div style="font-size: 12px; font-weight: 700; color: #cbd5e1;">Adult & Harmful Filter</div>
+              <div style="font-size: 10.5px; color: var(--text-dim);">Protected by Parent PIN in Parent Controls</div>
+            </div>
+          </div>
+          <span style="font-size: 10px; font-weight: 700; color: #818cf8; background: rgba(99, 102, 241, 0.15); padding: 3px 8px; border-radius: 8px; border: 1px solid rgba(99, 102, 241, 0.3);">🔒 PARENT ONLY</span>
         </div>
       </div>
 
@@ -1014,6 +1012,20 @@
 
       <!-- Parental Settings -->
       <div class="glass-card">
+        <!-- Adult Content Shield Toggle (Parent PIN Controlled) -->
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-title">
+              <span>🔞 Adult & Harmful Content Filter</span>
+            </div>
+            <div class="toggle-desc">Blocks 100+ adult domains, explicit content, and search terms.</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="adultShieldToggle" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+
         <div class="toggle-row">
           <div class="toggle-info">
             <div class="toggle-title">
