@@ -211,6 +211,223 @@
       letter-spacing: 1px;
     }
 
+    /* Focus Timer Countdown Card */
+    .timer-card {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(99, 102, 241, 0.08) 100%);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: 18px;
+      padding: 20px 24px;
+      margin-bottom: 22px;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 10px 30px -10px rgba(16, 185, 129, 0.2);
+      animation: fadeIn 0.4s ease;
+    }
+
+    .timer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .timer-badge {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #34d399;
+      background: rgba(16, 185, 129, 0.15);
+      padding: 4px 10px;
+      border-radius: 20px;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .timer-ratio {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .timer-countdown {
+      font-size: 44px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      font-variant-numeric: tabular-nums;
+      background: linear-gradient(135deg, #34d399 0%, #38bdf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin: 4px 0 8px;
+      line-height: 1.1;
+    }
+
+    .timer-subtext {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .timer-subtext strong {
+      color: #f8fafc;
+    }
+
+    .timer-progress-bar {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .timer-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #10b981, #06b6d4);
+      border-radius: 999px;
+      transition: width 1s linear;
+    }
+
+    .timer-completed-msg {
+      margin-top: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      color: #34d399;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .btn-unlock-site {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      border: none;
+      padding: 10px 22px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-unlock-site:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(16, 185, 129, 0.6);
+    }
+
+    /* Ambient Soundscapes Card */
+    .soundscapes-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 18px;
+      padding: 16px 20px;
+      margin-bottom: 22px;
+      text-align: left;
+    }
+
+    .soundscape-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .soundscape-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .soundscape-status {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+
+    .soundscape-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .sound-chip {
+      flex: 1;
+      padding: 9px 4px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .sound-chip:hover {
+      background: rgba(255, 255, 255, 0.09);
+      color: var(--text-main);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .sound-chip.active {
+      background: rgba(16, 185, 129, 0.18);
+      border-color: rgba(16, 185, 129, 0.5);
+      color: #34d399;
+      box-shadow: 0 0 16px rgba(16, 185, 129, 0.25);
+    }
+
+    .soundscape-volume-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .volume-slider {
+      flex: 1;
+      height: 4px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 999px;
+      outline: none;
+      accent-color: #10b981;
+    }
+
+    .volume-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #10b981;
+      cursor: pointer;
+      box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
     /* Action Buttons */
     .actions {
       display: flex;
@@ -332,6 +549,41 @@
     <p class="subtitle" id="subtext">This website was paused to protect your study time and keep distractions away.</p>
 
     <div class="blocked-target" id="blockedTarget">website.com</div>
+
+    <!-- Live Timer Countdown Card (Shown only when blocked under an active timer) -->
+    <div class="timer-card" id="timerCard" style="display: none;">
+      <div class="timer-header">
+        <span class="timer-badge">⏳ Focus Session Active</span>
+        <span class="timer-ratio" id="timerRatio">Temporary Lock</span>
+      </div>
+      <div class="timer-countdown" id="timerCountdown">24:59</div>
+      <p class="timer-subtext" id="timerSubtext">This website will automatically unlock in <strong id="timerCountdownText">25 minutes</strong>.</p>
+      <div class="timer-progress-bar">
+        <div class="timer-progress-fill" id="timerProgressFill" style="width: 100%;"></div>
+      </div>
+      <div class="timer-completed-msg" id="timerCompletedMsg" style="display: none;">
+        <span>🎉 Focus Session Complete! Access Restored.</span>
+        <button class="btn-unlock-site" id="unlockSiteBtn">🚀 Open Website</button>
+      </div>
+    </div>
+
+    <!-- Ambient Focus Soundscapes Card -->
+    <div class="soundscapes-card" id="soundscapeCard">
+      <div class="soundscape-header">
+        <span class="soundscape-title">🎧 Ambient Focus Soundscapes</span>
+        <span class="soundscape-status" id="audioStatus">Off</span>
+      </div>
+      <div class="soundscape-row">
+        <button class="sound-chip" data-sound="rain">🌧️ Rain</button>
+        <button class="sound-chip" data-sound="whitenoise">📻 White Noise</button>
+        <button class="sound-chip" data-sound="cafe">☕ Cafe</button>
+        <button class="sound-chip" data-sound="off">⏹ Off</button>
+      </div>
+      <div class="soundscape-volume-row">
+        <span style="font-size: 11px; color: var(--text-muted);">🔈 Volume</span>
+        <input type="range" id="soundVolume" min="0" max="100" value="80" class="volume-slider">
+      </div>
+    </div>
 
     <div class="quote-card">
       <div id="quoteContent">"Concentrate all your thoughts upon the work in hand. The sun's rays do not burn until brought to a focus."</div>
