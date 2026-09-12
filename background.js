@@ -143,6 +143,14 @@ chrome.runtime.onInstalled.addListener(async () => {
 
   // Sync DeclarativeNetRequest Dynamic Rules for zero-latency blocking
   await syncDeclarativeRules();
+
+  // Enforce Anti-Tamper immediately on all open tabs (ON by default)
+  await scanOpenTabsForTamperGuard();
+});
+
+// Scan on browser startup as well
+chrome.runtime.onStartup.addListener(async () => {
+  await scanOpenTabsForTamperGuard();
 });
 
 // Sync DeclarativeNetRequest Rules
@@ -333,10 +341,65 @@ function checkKeywordViolation(url, userKeywords = []) {
   }
 }
 
+// Anti-Tamper helper to detect browser extension/settings pages
+function isAntiTamperTarget(url) {
+  if (!url) return false;
+  const lower = url.toLowerCase().trim();
+  return (
+    lower.startsWith('chrome://extensions') ||
+    lower.startsWith('chrome://settings') ||
+    lower.startsWith('edge://extensions') ||
+    lower.startsWith('edge://settings') ||
+    lower.startsWith('brave://extensions') ||
+    lower.startsWith('brave://settings') ||
+    lower.startsWith('opera://extensions') ||
+    lower.startsWith('opera://settings') ||
+    lower.startsWith('vivaldi://extensions') ||
+    lower.startsWith('vivaldi://settings')
+  );
+}
+
+// Redirect and block tamper tab safely
+async function blockTamperTab(tabId) {
+  try {
+    await chrome.tabs.update(tabId, {
+      url: chrome.runtime.getURL('blocked.html?reason=tamper_shield')
+    });
+    chrome.notifications.create({
+      type: 'basic',
+      iconUrl: 'icon48.png',
+      title: '🛡️ StudyShield Anti-Tamper Guardian',
+      message: 'Extension settings and uninstall options are protected by Parent PIN and cannot be altered.'
+    });
+  } catch (err) {
+    // If Chrome blocks updating internal chrome:// page directly, close tab and display shield
+    try {
+      await chrome.tabs.remove(tabId);
+      await chrome.tabs.create({ url: chrome.runtime.getURL('blocked.html?reason=tamper_shield') });
+    } catch (e) {}
+  }
+}
+
+// Scan all open tabs to enforce anti-tamper immediately
+async function scanOpenTabsForTamperGuard() {
+  try {
+    const data = await chrome.storage.local.get(['parentalLockEnabled', 'strictTamperGuard']);
+    if (data.parentalLockEnabled !== false && data.strictTamperGuard !== false) {
+      const tabs = await chrome.tabs.query({});
+      for (const tab of tabs) {
+        const url = tab.pendingUrl || tab.url;
+        if (isAntiTamperTarget(url)) {
+          await blockTamperTab(tab.id);
+        }
+      }
+    }
+  } catch (e) {}
+}
+
 // Anti-Tamper & Tab Monitoring Listener
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
-  if (!changeInfo.url) return;
-  const currentUrl = changeInfo.url;
+  const currentUrl = changeInfo.url || tab.pendingUrl || tab.url;
+  if (!currentUrl) return;
 
   const data = await chrome.storage.local.get([
     'focusMode',
@@ -352,23 +415,10 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
     'parentAllowedWebsites'
   ]);
 
-  // 1. ANTI-TAMPER GUARDIAN: Block navigation to chrome://extensions or chrome://settings if strict mode is on
-  if (data.parentalLockEnabled && data.strictTamperGuard) {
-    const lowerUrl = currentUrl.toLowerCase();
-    if (lowerUrl.startsWith('chrome://extensions') || 
-        lowerUrl.startsWith('chrome://settings') || 
-        lowerUrl.startsWith('edge://extensions') ||
-        lowerUrl.startsWith('brave://extensions')) {
-      // Immediately redirect to Tamper Shield alert page
-      chrome.tabs.update(tabId, {
-        url: chrome.runtime.getURL('blocked.html?reason=tamper_shield')
-      });
-      chrome.notifications.create({
-        type: 'basic',
-        iconUrl: 'icon48.png',
-        title: '🛡️ StudyShield Parental Lock',
-        message: 'Extension settings are protected by Parent PIN and cannot be accessed or removed.'
-      });
+  // 1. ANTI-TAMPER GUARDIAN: Block navigation to chrome://extensions or chrome://settings (ON by default)
+  if (data.parentalLockEnabled !== false && data.strictTamperGuard !== false) {
+    if (isAntiTamperTarget(currentUrl)) {
+      await blockTamperTab(tabId);
       return;
     }
   }
@@ -453,16 +503,28 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
 
 // Also monitor newly created tabs for Anti-Tamper
 chrome.tabs.onCreated.addListener(async (tab) => {
-  if (!tab.url) return;
+  const currentUrl = tab.pendingUrl || tab.url;
+  if (!currentUrl) return;
   const data = await chrome.storage.local.get(['parentalLockEnabled', 'strictTamperGuard']);
-  if (data.parentalLockEnabled && data.strictTamperGuard) {
-    const lowerUrl = tab.url.toLowerCase();
-    if (lowerUrl.startsWith('chrome://extensions') || lowerUrl.startsWith('chrome://settings')) {
-      chrome.tabs.update(tab.id, {
-        url: chrome.runtime.getURL('blocked.html?reason=tamper_shield')
-      });
+  if (data.parentalLockEnabled !== false && data.strictTamperGuard !== false) {
+    if (isAntiTamperTarget(currentUrl)) {
+      await blockTamperTab(tab.id);
     }
   }
+});
+
+// Also monitor tab switching/activation for Anti-Tamper
+chrome.tabs.onActivated.addListener(async (activeInfo) => {
+  try {
+    const tab = await chrome.tabs.get(activeInfo.tabId);
+    const currentUrl = tab.pendingUrl || tab.url;
+    if (isAntiTamperTarget(currentUrl)) {
+      const data = await chrome.storage.local.get(['parentalLockEnabled', 'strictTamperGuard']);
+      if (data.parentalLockEnabled !== false && data.strictTamperGuard !== false) {
+        await blockTamperTab(tab.id);
+      }
+    }
+  } catch (e) {}
 });
 
 // Pomodoro Timer Alarm Handling
@@ -582,6 +644,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         const domain = request.domain.replace('www.', '').toLowerCase();
         tempOverrides.set(domain, Date.now() + (10 * 60 * 1000));
         await syncDeclarativeRules();
+        sendResponse({ success: true });
+      }
+      else if (request.action === 'checkTamperGuard') {
+        await scanOpenTabsForTamperGuard();
         sendResponse({ success: true });
       }
       else if (request.action === 'getTodayStats') {

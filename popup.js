@@ -493,8 +493,18 @@ async function loadSettings() {
   };
 
   document.getElementById('tamperGuardToggle').onchange = (e) => {
+    if (!isParentUnlocked) {
+      e.target.checked = true;
+      showToast('🔒 Parent PIN required to modify Anti-Uninstall protection');
+      return;
+    }
     chrome.storage.local.set({ strictTamperGuard: e.target.checked });
-    showToast('Anti-Tamper Guardian Updated');
+    if (e.target.checked) {
+      chrome.runtime.sendMessage({ action: 'checkTamperGuard' });
+      showToast('Anti-Uninstall Guardian Enabled');
+    } else {
+      showToast('Anti-Uninstall Guardian Disabled');
+    }
   };
 
   document.getElementById('safeSearchToggle').onchange = (e) => {
