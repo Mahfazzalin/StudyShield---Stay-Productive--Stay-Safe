@@ -71,11 +71,39 @@ function promptPinGate(onSuccess) {
   const pinInput = document.getElementById('gatePinInput');
   const pinError = document.getElementById('gatePinError');
   const submitBtn = document.getElementById('submitGateBtn');
+  const fillDefaultBtn = document.getElementById('fillDefaultPinBtn');
+  const toggleVisBtn = document.getElementById('togglePinVisBtn');
+  const defaultNotice = document.getElementById('defaultPinNotice');
 
   pinGate.classList.add('active');
   pinInput.value = '';
+  pinInput.type = 'password';
   pinError.style.display = 'none';
   pinInput.focus();
+
+  // Check if PIN has been customized
+  chrome.runtime.sendMessage({ action: 'checkPinStatus' }, (res) => {
+    if (res && res.isCustomized) {
+      if (defaultNotice) defaultNotice.style.display = 'none';
+      if (fillDefaultBtn) fillDefaultBtn.style.display = 'none';
+    } else {
+      if (defaultNotice) defaultNotice.style.display = 'block';
+      if (fillDefaultBtn) fillDefaultBtn.style.display = 'inline-block';
+    }
+  });
+
+  // Toggle Visibility
+  toggleVisBtn.onclick = () => {
+    pinInput.type = pinInput.type === 'password' ? 'text' : 'password';
+  };
+
+  // Quick fill default PIN (1234)
+  if (fillDefaultBtn) {
+    fillDefaultBtn.onclick = () => {
+      pinInput.value = '1234';
+      handleVerify();
+    };
+  }
 
   const handleVerify = () => {
     const enteredPin = pinInput.value.trim();
@@ -85,6 +113,7 @@ function promptPinGate(onSuccess) {
       if (response && response.valid) {
         isParentUnlocked = true;
         pinGate.classList.remove('active');
+        checkDefaultPinWarning();
         onSuccess();
       } else {
         pinError.style.display = 'block';
@@ -129,7 +158,14 @@ function loadCurrentTabInfo() {
 
   document.getElementById('quickAllowBtn').addEventListener('click', async () => {
     if (!currentDomain) return;
-    const data = await chrome.storage.local.get(['allowedWebsites', 'permanentBlocked']);
+    const data = await chrome.storage.local.get(['allowedWebsites', 'permanentBlocked', 'parentBlockedWebsites']);
+    const parentBlocked = data.parentBlockedWebsites || [];
+
+    if (parentBlocked.includes(currentDomain)) {
+      showToast('🔒 Cannot allow: Locked by Parent PIN!');
+      return;
+    }
+
     let allowed = data.allowedWebsites || [];
     let blocked = (data.permanentBlocked || []).filter(s => s.toLowerCase() !== currentDomain);
 
@@ -146,7 +182,14 @@ function loadCurrentTabInfo() {
 
   document.getElementById('quickBlockBtn').addEventListener('click', async () => {
     if (!currentDomain) return;
-    const data = await chrome.storage.local.get(['allowedWebsites', 'permanentBlocked']);
+    const data = await chrome.storage.local.get(['allowedWebsites', 'permanentBlocked', 'parentAllowedWebsites']);
+    const parentAllowed = data.parentAllowedWebsites || [];
+
+    if (parentAllowed.includes(currentDomain)) {
+      showToast('⭐ Cannot block: Approved by Parent!');
+      return;
+    }
+
     let blocked = data.permanentBlocked || [];
     let allowed = (data.allowedWebsites || []).filter(s => s.toLowerCase() !== currentDomain);
 
@@ -164,25 +207,70 @@ function loadCurrentTabInfo() {
 
 async function updateCurrentSiteStatus() {
   if (!currentDomain) return;
-  const data = await chrome.storage.local.get(['allowedWebsites', 'permanentBlocked']);
+  const data = await chrome.storage.local.get([
+    'allowedWebsites',
+    'permanentBlocked',
+    'parentBlockedWebsites',
+    'parentAllowedWebsites'
+  ]);
   const allowed = data.allowedWebsites || [];
   const blocked = data.permanentBlocked || [];
+  const parentBlocked = data.parentBlockedWebsites || [];
+  const parentAllowed = data.parentAllowedWebsites || [];
 
   const tag = document.getElementById('currentSiteTag');
   const meta = document.getElementById('currentSiteMeta');
+  const allowBtn = document.getElementById('quickAllowBtn');
+  const blockBtn = document.getElementById('quickBlockBtn');
 
-  if (blocked.includes(currentDomain)) {
+  if (parentBlocked.includes(currentDomain)) {
+    tag.className = 'site-status-tag status-blocked';
+    tag.textContent = '🔒 Parent Locked';
+    meta.textContent = 'Permanently restricted by Parent PIN';
+    allowBtn.disabled = true;
+    allowBtn.style.opacity = '0.5';
+    blockBtn.disabled = true;
+    blockBtn.style.opacity = '0.7';
+    blockBtn.textContent = '🔒 Parent Blocked';
+  } else if (parentAllowed.includes(currentDomain)) {
+    tag.className = 'site-status-tag status-allowed';
+    tag.textContent = '⭐ Parent Safe';
+    meta.textContent = 'Approved by Parent (Always safe)';
+    allowBtn.disabled = true;
+    allowBtn.style.opacity = '0.7';
+    allowBtn.textContent = '⭐ Approved';
+    blockBtn.disabled = true;
+    blockBtn.style.opacity = '0.5';
+  } else if (blocked.includes(currentDomain)) {
     tag.className = 'site-status-tag status-blocked';
     tag.textContent = 'Blocked';
-    meta.textContent = 'Permanently restricted';
+    meta.textContent = 'In your focus blocklist';
+    allowBtn.disabled = false;
+    allowBtn.style.opacity = '1';
+    allowBtn.innerHTML = '<span>✓</span> Allow Domain';
+    blockBtn.disabled = false;
+    blockBtn.style.opacity = '0.7';
+    blockBtn.innerHTML = '<span>✕</span> Blocked';
   } else if (allowed.includes(currentDomain)) {
     tag.className = 'site-status-tag status-allowed';
     tag.textContent = 'Allowed';
     meta.textContent = 'On educational whitelist';
+    allowBtn.disabled = false;
+    allowBtn.style.opacity = '0.7';
+    allowBtn.innerHTML = '<span>✓</span> Allowed';
+    blockBtn.disabled = false;
+    blockBtn.style.opacity = '1';
+    blockBtn.innerHTML = '<span>✕</span> Block Domain';
   } else {
     tag.className = 'site-status-tag status-neutral';
     tag.textContent = 'Standard';
     meta.textContent = 'Unrestricted browsing';
+    allowBtn.disabled = false;
+    allowBtn.style.opacity = '1';
+    allowBtn.innerHTML = '<span>✓</span> Allow Domain';
+    blockBtn.disabled = false;
+    blockBtn.style.opacity = '1';
+    blockBtn.innerHTML = '<span>✕</span> Block Domain';
   }
 }
 
@@ -419,6 +507,19 @@ async function loadSettings() {
   document.getElementById('addKeywordBtn').onclick = () => addListItem('newKeywordInput', 'blockedKeywords');
   document.getElementById('newKeywordInput').onkeydown = (e) => { if (e.key === 'Enter') addListItem('newKeywordInput', 'blockedKeywords'); };
 
+  // Parent Add Item Listeners
+  const addParentBlockBtn = document.getElementById('addParentBlockedBtn');
+  if (addParentBlockBtn) {
+    addParentBlockBtn.onclick = () => addListItem('newParentBlockedInput', 'parentBlockedWebsites');
+    document.getElementById('newParentBlockedInput').onkeydown = (e) => { if (e.key === 'Enter') addListItem('newParentBlockedInput', 'parentBlockedWebsites'); };
+  }
+
+  const addParentAllowBtn = document.getElementById('addParentAllowedBtn');
+  if (addParentAllowBtn) {
+    addParentAllowBtn.onclick = () => addListItem('newParentAllowedInput', 'parentAllowedWebsites');
+    document.getElementById('newParentAllowedInput').onkeydown = (e) => { if (e.key === 'Enter') addListItem('newParentAllowedInput', 'parentAllowedWebsites'); };
+  }
+
   renderAllChips();
   renderStats(data.streakStats);
 }
@@ -452,18 +553,120 @@ async function removeListItem(item, storageKey) {
 }
 
 async function renderAllChips() {
-  const data = await chrome.storage.local.get(['permanentBlocked', 'allowedWebsites', 'blockedKeywords']);
-  const blocked = data.permanentBlocked || [];
-  const allowed = data.allowedWebsites || [];
+  const data = await chrome.storage.local.get([
+    'permanentBlocked',
+    'allowedWebsites',
+    'blockedKeywords',
+    'parentBlockedWebsites',
+    'parentAllowedWebsites'
+  ]);
+  const userBlocked = data.permanentBlocked || [];
+  const userAllowed = data.allowedWebsites || [];
   const keywords = data.blockedKeywords || [];
+  const parentBlocked = data.parentBlockedWebsites || [];
+  const parentAllowed = data.parentAllowedWebsites || [];
 
-  document.getElementById('blockedSitesCount').textContent = blocked.length;
-  document.getElementById('allowedSitesCount').textContent = allowed.length;
+  // Update counts
+  document.getElementById('blockedSitesCount').textContent = userBlocked.length + parentBlocked.length;
+  document.getElementById('allowedSitesCount').textContent = userAllowed.length + parentAllowed.length;
   document.getElementById('keywordsCount').textContent = keywords.length;
 
-  renderChipsList('blockedChips', blocked, 'permanentBlocked');
-  renderChipsList('allowedChips', allowed, 'allowedWebsites');
+  const parentBlockedCountEl = document.getElementById('parentBlockedCount');
+  if (parentBlockedCountEl) parentBlockedCountEl.textContent = parentBlocked.length;
+  const parentAllowedCountEl = document.getElementById('parentAllowedCount');
+  if (parentAllowedCountEl) parentAllowedCountEl.textContent = parentAllowed.length;
+
+  // 1. Render in Shield Tab (Student/Child View)
+  renderShieldBlockedChips('blockedChips', userBlocked, parentBlocked);
+  renderShieldAllowedChips('allowedChips', userAllowed, parentAllowed);
   renderChipsList('keywordChips', keywords, 'blockedKeywords');
+
+  // 2. Render in Parents Tab (Parent View - can remove with PIN unlocked)
+  renderChipsList('parentBlockedChips', parentBlocked, 'parentBlockedWebsites');
+  renderChipsList('parentAllowedChips', parentAllowed, 'parentAllowedWebsites');
+}
+
+function renderShieldBlockedChips(containerId, userBlocked, parentBlocked) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  container.innerHTML = '';
+
+  if (userBlocked.length === 0 && parentBlocked.length === 0) {
+    container.innerHTML = '<span style="font-size: 11.5px; color: var(--text-dim); padding: 4px;">No custom items added yet</span>';
+    return;
+  }
+
+  // Parent-Locked items: Child cannot remove them!
+  parentBlocked.forEach(item => {
+    const chip = document.createElement('div');
+    chip.className = 'chip-item';
+    chip.style.borderColor = 'rgba(244, 63, 94, 0.4)';
+    chip.style.background = 'rgba(244, 63, 94, 0.12)';
+    chip.title = 'Permanently locked by Parent PIN. Cannot be unblocked by child.';
+    chip.innerHTML = `
+      <span>🔒 ${item}</span>
+      <span style="font-size: 10px; color: #fda4af; font-weight: 800; margin-left: 2px;">LOCKED</span>
+    `;
+    chip.onclick = () => {
+      showToast('🔒 Locked by Parent: Cannot be removed without Parent PIN!');
+    };
+    container.appendChild(chip);
+  });
+
+  // User items: Child CAN remove their own added blocks
+  userBlocked.forEach(item => {
+    const chip = document.createElement('div');
+    chip.className = 'chip-item';
+    chip.innerHTML = `
+      <span>${item}</span>
+      <span class="chip-remove" title="Remove">✕</span>
+    `;
+    chip.querySelector('.chip-remove').onclick = (e) => {
+      e.stopPropagation();
+      removeListItem(item, 'permanentBlocked');
+    };
+    container.appendChild(chip);
+  });
+}
+
+function renderShieldAllowedChips(containerId, userAllowed, parentAllowed) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  container.innerHTML = '';
+
+  if (userAllowed.length === 0 && parentAllowed.length === 0) {
+    container.innerHTML = '<span style="font-size: 11.5px; color: var(--text-dim); padding: 4px;">No custom items added yet</span>';
+    return;
+  }
+
+  // Parent-Approved items: Always Safe
+  parentAllowed.forEach(item => {
+    const chip = document.createElement('div');
+    chip.className = 'chip-item';
+    chip.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+    chip.style.background = 'rgba(16, 185, 129, 0.12)';
+    chip.title = 'Approved safe website by Parent.';
+    chip.innerHTML = `
+      <span>⭐ ${item}</span>
+      <span style="font-size: 10px; color: #6ee7b7; font-weight: 800; margin-left: 2px;">APPROVED</span>
+    `;
+    container.appendChild(chip);
+  });
+
+  // User allowed items
+  userAllowed.forEach(item => {
+    const chip = document.createElement('div');
+    chip.className = 'chip-item';
+    chip.innerHTML = `
+      <span>${item}</span>
+      <span class="chip-remove" title="Remove">✕</span>
+    `;
+    chip.querySelector('.chip-remove').onclick = (e) => {
+      e.stopPropagation();
+      removeListItem(item, 'allowedWebsites');
+    };
+    container.appendChild(chip);
+  });
 }
 
 function renderChipsList(containerId, items, storageKey) {
@@ -490,7 +693,27 @@ function renderChipsList(containerId, items, storageKey) {
 // ==========================================
 // 6. Parental Zone & Fortress Mode Generator
 // ==========================================
+function checkDefaultPinWarning() {
+  chrome.runtime.sendMessage({ action: 'checkPinStatus' }, (res) => {
+    const warnCard = document.getElementById('warnDefaultPinCard');
+    if (warnCard) {
+      warnCard.style.display = (res && res.isCustomized) ? 'none' : 'block';
+    }
+  });
+}
+
 function initParentalZone() {
+  // Re-Lock Button
+  const reLockBtn = document.getElementById('reLockParentBtn');
+  if (reLockBtn) {
+    reLockBtn.addEventListener('click', () => {
+      isParentUnlocked = false;
+      const homeBtn = document.querySelector('[data-tab="tab-dashboard"]');
+      if (homeBtn) homeBtn.click();
+      showToast('🔒 Parent Mode Locked');
+    });
+  }
+
   // Change PIN
   document.getElementById('savePinBtn').addEventListener('click', () => {
     const newPin = document.getElementById('newPinInput').value.trim();
@@ -502,6 +725,7 @@ function initParentalZone() {
     chrome.runtime.sendMessage({ action: 'setNewPin', pin: newPin }, () => {
       document.getElementById('newPinInput').value = '';
       showToast('Parent Master PIN updated successfully!');
+      checkDefaultPinWarning();
     });
   });
 

@@ -95,6 +95,8 @@ chrome.runtime.onInstalled.addListener(async () => {
     'strictTamperGuard',
     'safeSearchEnabled',
     'soundscapesEnabled',
+    'parentBlockedWebsites',
+    'parentAllowedWebsites',
     'streakStats',
     'theme'
   ]);
@@ -105,6 +107,8 @@ chrome.runtime.onInstalled.addListener(async () => {
   if (data.focusMode === undefined) updates.focusMode = false;
   if (!data.allowedWebsites) updates.allowedWebsites = ['wikipedia.org', 'khanacademy.org', 'google.com', 'classroom.google.com', 'coursera.org'];
   if (!data.permanentBlocked) updates.permanentBlocked = [];
+  if (!data.parentBlockedWebsites) updates.parentBlockedWebsites = [];
+  if (!data.parentAllowedWebsites) updates.parentAllowedWebsites = [];
   if (!data.blockedKeywords) updates.blockedKeywords = [];
   if (!data.timerDuration) updates.timerDuration = 25;
   if (data.usePrelistedSites === undefined) updates.usePrelistedSites = true;
@@ -149,26 +153,37 @@ async function syncDeclarativeRules() {
     const data = await chrome.storage.local.get([
       'adultShieldEnabled',
       'usePrelistedSites',
-      'permanentBlocked'
+      'permanentBlocked',
+      'parentBlockedWebsites'
     ]);
 
-    const domainsToBlock = new Set();
+    const domainsToBlock = new Map(); // domain -> reason
 
     // 1. Adult domains if adult shield is active
     if (data.adultShieldEnabled !== false) {
-      defaultBlockedDomains.forEach(d => domainsToBlock.add(d));
+      defaultBlockedDomains.forEach(d => domainsToBlock.set(d, 'content_filter'));
     }
 
     // 2. Prelisted distracting domains
     if (data.usePrelistedSites) {
-      prelistedDistractingSites.forEach(d => domainsToBlock.add(d));
+      prelistedDistractingSites.forEach(d => {
+        if (!domainsToBlock.has(d)) domainsToBlock.set(d, 'site_blocked');
+      });
     }
 
-    // 3. User permanently blocked domains
+    // 3. Parent-enforced blocked domains (Locked by Parent PIN)
+    if (Array.isArray(data.parentBlockedWebsites)) {
+      data.parentBlockedWebsites.forEach(d => {
+        const clean = d.trim().replace(/^https?:\/\//i, '').replace('www.', '').split('/')[0].toLowerCase();
+        if (clean) domainsToBlock.set(clean, 'parent_block');
+      });
+    }
+
+    // 4. Regular user blocked domains
     if (Array.isArray(data.permanentBlocked)) {
       data.permanentBlocked.forEach(d => {
         const clean = d.trim().replace(/^https?:\/\//i, '').replace('www.', '').split('/')[0].toLowerCase();
-        if (clean) domainsToBlock.add(clean);
+        if (clean && !domainsToBlock.has(clean)) domainsToBlock.set(clean, 'site_blocked');
       });
     }
 
@@ -186,14 +201,14 @@ async function syncDeclarativeRules() {
     const newRules = [];
     let ruleId = 1;
 
-    for (let domain of domainsToBlock) {
+    for (let [domain, reason] of domainsToBlock.entries()) {
       if (ruleId > 4500) break; // Chrome DNR dynamic rule limit is 5000
       newRules.push({
         id: ruleId++,
-        priority: 1,
+        priority: reason === 'parent_block' ? 2 : 1,
         action: {
           type: 'redirect',
-          redirect: { url: `${blockedUrl}?reason=site_blocked&domain=${encodeURIComponent(domain)}` }
+          redirect: { url: `${blockedUrl}?reason=${reason}&domain=${encodeURIComponent(domain)}` }
         },
         condition: {
           urlFilter: `||${domain}`,
@@ -332,7 +347,9 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
     'adultShieldEnabled',
     'parentalLockEnabled',
     'strictTamperGuard',
-    'safeSearchEnabled'
+    'safeSearchEnabled',
+    'parentBlockedWebsites',
+    'parentAllowedWebsites'
   ]);
 
   // 1. ANTI-TAMPER GUARDIAN: Block navigation to chrome://extensions or chrome://settings if strict mode is on
@@ -375,6 +392,32 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
       } else {
         tempOverrides.delete(domain);
       }
+    }
+
+    // 2.1 Check Parent-Enforced Blocklist (Children cannot bypass this)
+    const parentBlocked = data.parentBlockedWebsites || [];
+    const isParentBlocked = parentBlocked.some(site => {
+      const clean = site.replace(/^https?:\/\//i, '').replace('www.', '').toLowerCase();
+      return domain === clean || domain.endsWith('.' + clean);
+    });
+
+    if (isParentBlocked) {
+      logBlockedAttempt(domain, 'parent_block');
+      chrome.tabs.update(tabId, {
+        url: chrome.runtime.getURL(`blocked.html?reason=parent_block&domain=${encodeURIComponent(domain)}`)
+      });
+      return;
+    }
+
+    // 2.2 Check Parent-Approved Whitelist (Always allowed)
+    const parentAllowed = data.parentAllowedWebsites || [];
+    const isParentAllowed = parentAllowed.some(site => {
+      const clean = site.replace(/^https?:\/\//i, '').replace('www.', '').toLowerCase();
+      return domain === clean || domain.endsWith('.' + clean);
+    });
+
+    if (isParentAllowed) {
+      return; // Parent has whitelisted this site permanently
     }
 
     // 3. Keyword Search Verification
@@ -508,15 +551,31 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         sendResponse({ success: true });
       }
       else if (request.action === 'verifyPin') {
-        const inputHash = await hashString(request.pin);
-        const data = await chrome.storage.local.get(['parentPinHash']);
-        const isValid = inputHash === data.parentPinHash;
-        sendResponse({ valid: isValid });
+        const inputPin = String(request.pin || '').trim();
+        const inputHash = await hashString(inputPin);
+        const defaultHash = await hashString('1234');
+        const data = await chrome.storage.local.get(['parentPinHash', 'isPinCustomized']);
+        
+        // If not customized yet, 1234 is unconditionally valid
+        const isDefault = (inputPin === '1234' && !data.isPinCustomized);
+        const currentHash = data.parentPinHash || defaultHash;
+        const isValid = isDefault || (inputHash === currentHash);
+
+        // Self-heal storage if needed
+        if (!data.parentPinHash) {
+          await chrome.storage.local.set({ parentPinHash: defaultHash, isPinCustomized: false });
+        }
+        sendResponse({ valid: isValid, isCustomized: !!data.isPinCustomized });
       }
       else if (request.action === 'setNewPin') {
-        const newHash = await hashString(request.pin);
-        await chrome.storage.local.set({ parentPinHash: newHash });
+        const newPin = String(request.pin || '').trim();
+        const newHash = await hashString(newPin);
+        await chrome.storage.local.set({ parentPinHash: newHash, isPinCustomized: true });
         sendResponse({ success: true });
+      }
+      else if (request.action === 'checkPinStatus') {
+        const data = await chrome.storage.local.get(['isPinCustomized']);
+        sendResponse({ isCustomized: !!data.isPinCustomized });
       }
       else if (request.action === 'tempOverride') {
         // Allow domain for 10 minutes

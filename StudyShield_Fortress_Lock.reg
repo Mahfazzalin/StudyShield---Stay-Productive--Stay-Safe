@@ -1,0 +1,8 @@
+Windows Registry Editor Version 5.00
+
+; StudyShield 1-Click Anti-Uninstall Lock
+[HKEY_CURRENT_USER\Software\Policies\Google\Chrome\ExtensionInstallForcelist]
+"101"="pkkpphojcipmdopgkbmkjhfiiacllkop;https://clients2.google.com/service/update2/crx"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Google\Chrome\ExtensionInstallForcelist]
+"101"="pkkpphojcipmdopgkbmkjhfiiacllkop;https://clients2.google.com/service/update2/crx"

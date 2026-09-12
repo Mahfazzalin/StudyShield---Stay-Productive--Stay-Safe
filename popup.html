@@ -985,6 +985,22 @@
 
     <!-- TAB 4: PARENTS (TAMPER DEFENSE & ANTI-UNINSTALL) -->
     <div class="tab-pane" id="tab-parents">
+      <!-- Active Mode & Re-Lock Bar -->
+      <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 12px; padding: 10px 14px; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between;">
+        <div>
+          <div style="font-size: 12.5px; font-weight: 700; color: #34d399;">🔓 Parent Mode Active</div>
+          <div style="font-size: 11px; color: var(--text-dim);">Settings are temporarily unlocked.</div>
+        </div>
+        <button class="btn-quick btn-block" id="reLockParentBtn" style="padding: 6px 12px; font-size: 11.5px;">
+          <span>🔒 Lock Now</span>
+        </button>
+      </div>
+
+      <!-- Warning if still using default PIN -->
+      <div id="warnDefaultPinCard" style="background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 12px; padding: 10px 14px; margin-bottom: 14px; font-size: 12px; color: #fde68a; line-height: 1.4; display: none;">
+        ⚠️ <strong>Important:</strong> You are using the default PIN (<strong>1234</strong>). Please set your own private secret PIN below so children cannot unlock these settings.
+      </div>
+
       <!-- Fortress Mode Banner -->
       <div class="fortress-banner">
         <div class="fortress-header">
@@ -1028,6 +1044,48 @@
         </div>
       </div>
 
+      <!-- Parent-Enforced Blocklist Card -->
+      <div class="glass-card" style="border: 1px solid rgba(244, 63, 94, 0.35); background: rgba(244, 63, 94, 0.06);">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span>🔒</span>
+            <span style="font-size: 13.5px; font-weight: 800; color: #fda4af;">Parent-Locked Blocklist</span>
+          </div>
+          <span class="badge" id="parentBlockedCount" style="background: rgba(244, 63, 94, 0.2); color: #fda4af; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 700;">0</span>
+        </div>
+        <p style="font-size: 11px; color: #cbd5e1; line-height: 1.4; margin-bottom: 10px;">
+          Websites added here are <strong>permanently locked</strong> with your Parent PIN. Children cannot unblock or bypass them.
+        </p>
+        <div class="input-row">
+          <input type="text" class="text-input" id="newParentBlockedInput" placeholder="e.g. roblox.com, tiktok.com">
+          <button class="btn-add" id="addParentBlockedBtn" style="background: rgba(244, 63, 94, 0.3); border-color: rgba(244, 63, 94, 0.5); color: #fda4af;">
+            🔒 Lock Site
+          </button>
+        </div>
+        <div class="chips-container" id="parentBlockedChips" style="margin-top: 10px;"></div>
+      </div>
+
+      <!-- Parent-Approved Safe Sites Card -->
+      <div class="glass-card" style="border: 1px solid rgba(16, 185, 129, 0.35); background: rgba(16, 185, 129, 0.06);">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span>⭐</span>
+            <span style="font-size: 13.5px; font-weight: 800; color: #6ee7b7;">Parent-Approved Safe Sites</span>
+          </div>
+          <span class="badge" id="parentAllowedCount" style="background: rgba(16, 185, 129, 0.2); color: #6ee7b7; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 700;">0</span>
+        </div>
+        <p style="font-size: 11px; color: #cbd5e1; line-height: 1.4; margin-bottom: 10px;">
+          Safe, educational websites that are <strong>always unlocked</strong> and cannot be blocked by the child.
+        </p>
+        <div class="input-row">
+          <input type="text" class="text-input" id="newParentAllowedInput" placeholder="e.g. wikipedia.org, khanacademy.org">
+          <button class="btn-add" id="addParentAllowedBtn" style="background: rgba(16, 185, 129, 0.3); border-color: rgba(16, 185, 129, 0.5); color: #6ee7b7;">
+            ⭐ Approve Site
+          </button>
+        </div>
+        <div class="chips-container" id="parentAllowedChips" style="margin-top: 10px;"></div>
+      </div>
+
       <!-- Change PIN -->
       <div class="glass-card">
         <div class="current-site-title">🔑 Change Parent Master PIN</div>
@@ -1036,7 +1094,7 @@
           <button class="btn-add" id="savePinBtn">Update PIN</button>
         </div>
         <div style="font-size: 11px; color: var(--text-dim); margin-top: 6px;">
-          Default PIN is <strong>1234</strong>. Keep this secret from children.
+          Keep your PIN secret from children.
         </div>
       </div>
     </div>
@@ -1081,16 +1139,32 @@
 
   <!-- PIN Protection Gate (Modal for sensitive tabs) -->
   <div class="pin-gate" id="pinGate">
-    <div style="font-size: 38px; margin-bottom: 12px;">🔒</div>
-    <h2 style="font-size: 18px; font-weight: 700; margin-bottom: 6px;">Parent Access Required</h2>
-    <p style="font-size: 12.5px; color: var(--text-muted); max-width: 260px; margin-bottom: 18px;">
-      This section is locked to prevent unauthorized changes by children.
+    <div style="font-size: 38px; margin-bottom: 8px;">🔒</div>
+    <h2 style="font-size: 18px; font-weight: 700; margin-bottom: 4px;">Parent Access Required</h2>
+    <p style="font-size: 12px; color: var(--text-muted); max-width: 280px; margin-bottom: 12px;">
+      This section is locked so children cannot disable the shields or change settings.
     </p>
-    <input type="password" maxlength="6" class="text-input" id="gatePinInput" placeholder="••••" style="text-align: center; font-size: 22px; letter-spacing: 6px; width: 160px; margin-bottom: 12px;">
-    <div style="color: var(--accent-rose); font-size: 12px; margin-bottom: 12px; display: none;" id="gatePinError">Incorrect PIN.</div>
+
+    <!-- First-Time Default PIN Banner -->
+    <div id="defaultPinNotice" style="background: rgba(99, 102, 241, 0.15); border: 1px dashed rgba(99, 102, 241, 0.4); border-radius: 12px; padding: 10px 14px; font-size: 12px; color: #c7d2fe; margin-bottom: 12px; text-align: left; line-height: 1.4; width: 100%; max-width: 320px;">
+      🔑 <strong>First Time Here?</strong><br>
+      Default PIN is: <strong style="color: #fbbf24; font-size: 14px;">1234</strong><br>
+      <span style="font-size: 11px; opacity: 0.85;">Enter 1234 to unlock, then set your own personal PIN.</span>
+    </div>
+
+    <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px;">
+      <input type="password" maxlength="6" class="text-input" id="gatePinInput" placeholder="••••" style="text-align: center; font-size: 22px; letter-spacing: 6px; width: 140px;">
+      <button type="button" id="togglePinVisBtn" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #cbd5e1; padding: 8px 10px; border-radius: 10px; cursor: pointer; font-size: 14px;" title="Show/Hide PIN">👁️</button>
+    </div>
+
+    <button type="button" id="fillDefaultPinBtn" style="background: transparent; border: 1px solid rgba(255,255,255,0.15); color: #a5b4fc; font-size: 11px; padding: 4px 12px; border-radius: 8px; cursor: pointer; margin-bottom: 12px;">
+      ⚡ Quick Fill Default PIN (1234)
+    </button>
+
+    <div style="color: var(--accent-rose); font-size: 12px; margin-bottom: 12px; display: none;" id="gatePinError">Incorrect PIN. Try 1234 if you haven't changed it.</div>
     <div style="display: flex; gap: 8px;">
       <button class="btn-quick" id="cancelGateBtn" style="background: rgba(255,255,255,0.1); color: white; padding: 8px 16px;">Cancel</button>
-      <button class="btn-quick btn-allow" id="submitGateBtn" style="padding: 8px 20px;">Unlock</button>
+      <button class="btn-quick btn-allow" id="submitGateBtn" style="padding: 8px 22px;">Unlock</button>
     </div>
   </div>
 

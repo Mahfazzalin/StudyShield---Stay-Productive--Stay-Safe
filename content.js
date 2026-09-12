@@ -25,14 +25,39 @@
         'permanentBlocked',
         'blockedKeywords',
         'usePrelistedSites',
-        'adultShieldEnabled'
+        'adultShieldEnabled',
+        'parentBlockedWebsites',
+        'parentAllowedWebsites'
       ], (data) => {
         if (chrome.runtime.lastError) return;
 
         const currentUrl = window.location.href.toLowerCase();
         const currentDomain = window.location.hostname.replace('www.', '').toLowerCase();
 
-        // 1. Check Adult Keyword in URL or Page Title if adult shield is active
+        // 1. Check Parent-Enforced Blocklist (Locked by Parent PIN)
+        const parentBlocked = data.parentBlockedWebsites || [];
+        const isParentBlocked = parentBlocked.some(site => {
+          const clean = site.replace(/^https?:\/\//i, '').replace('www.', '').toLowerCase();
+          return currentDomain === clean || currentDomain.endsWith('.' + clean);
+        });
+
+        if (isParentBlocked) {
+          blockCurrentPage('parent_block', currentDomain);
+          return;
+        }
+
+        // 2. Check Parent-Approved Whitelist (Always Allowed)
+        const parentAllowed = data.parentAllowedWebsites || [];
+        const isParentAllowed = parentAllowed.some(site => {
+          const clean = site.replace(/^https?:\/\//i, '').replace('www.', '').toLowerCase();
+          return currentDomain === clean || currentDomain.endsWith('.' + clean);
+        });
+
+        if (isParentAllowed) {
+          return; // Whitelisted by parent
+        }
+
+        // 3. Check Adult Keyword in URL or Page Title if adult shield is active
         if (data.adultShieldEnabled !== false) {
           const pageTitle = (document.title || '').toLowerCase();
           for (let kw of defaultBlockedKeywords) {
@@ -43,7 +68,7 @@
           }
         }
 
-        // 2. Check Custom User Blocked Keywords
+        // 4. Check Custom User Blocked Keywords
         const userKeywords = data.blockedKeywords || [];
         const pageTitle = (document.title || '').toLowerCase();
         for (let kw of userKeywords) {

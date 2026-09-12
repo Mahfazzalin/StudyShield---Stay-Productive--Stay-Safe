@@ -57,6 +57,14 @@ document.addEventListener('DOMContentLoaded', () => {
       statusIcon.textContent = '⏱️';
       break;
 
+    case 'parent_block':
+      badgeText.className = 'badge badge-danger';
+      badgeText.textContent = '🔒 Parent Lock Enforced';
+      headline.textContent = 'Restricted by Your Parent';
+      subtext.textContent = 'This website has been strictly locked by your parent. You cannot browse or unblock this website without your parent entering the Master PIN.';
+      statusIcon.textContent = '🔒';
+      break;
+
     case 'tamper_shield':
       badgeText.className = 'badge badge-danger';
       badgeText.textContent = '🔒 Parental Tamper Lock';
