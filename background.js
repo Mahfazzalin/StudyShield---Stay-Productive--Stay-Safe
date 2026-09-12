@@ -1,9 +1,7 @@
-// Default blocked keywords for adult content (ALWAYS ACTIVE - hidden feature)
-const defaultBlockedKeywords = [
-  '1xbet', 'abuse', 'adult', 'adult ai', 'adult bot', 'adult cam', 'fuck', 'fucking', 'adult chat', 'adult dating', 'adult download', 'adult forum', 'adult game', 'adult video', 'affair', 'ai girlfriend', 'ai nude', 'alcohol', 'alcohol store', 'anal', 'anal sex', 'bangbros', 'bdsm', 'beer', 'bet app', 'bet365', 'betting', 'blackjack', 'blackmail', 'blood', 'blood video', 'blowjob', 'bomb', 'bong', 'boobs', 'brazzers', 'breast', 'brothel', 'brothel house', 'bully', 'bumble', 'buy cocaine', 'buy heroin', 'buy weed', 'cam show', 'camgirl', 'cannabis', 'casino', 'chat sex', 'cocaine', 'cocaine delivery', 'condom', 'credit card fraud', 'crime', 'cumshot', 'curse', 'cybercrime', 'dark market', 'darkweb', 'dating', 'death', 'deepfake', 'deepweb', 'drug', 'drug dealer', 'drug dealing', 'drug party', 'drug shop', 'drugs online', 'ecstasy', 'erotic', 'erotic chat', 'erotic dance', 'erotic story', 'erotic video', 'escort', 'escort service', 'explicit', 'extreme sex', 'fetish', 'fetish porn', 'fight', 'fight club', 'fraud', 'gamble', 'gay porn', 'gay video', 'gaysex', 'grindr', 'group sex', 'gun', 'guns for sale', 'hack', 'hang', 'hardcore', 'hate', 'hentai', 'hentai video', 'heroin', 'hitman', 'hooker', 'hookup', 'hot video', 'human trafficking', 'illegal', 'illegal drugs', 'incest', 'incest story', 'intercourse', 'isis', 'jackpot', 'joint', 'kill', 'kill myself', 'kiss', 'knife', 'lap dance', 'lesbian', 'lesbian video', 'live sex', 'lottery', 'lust', 'lustful', 'malware', 'marijuana', 'masturbate', 'meth', 'milf', 'murder', 'murder plan', 'naked', 'naked boy', 'naked girl', 'narcotic', 'naughty america', 'nazi', 'night club', 'nsfw', 'nude', 'nude ai', 'nude chat', 'nude photo', 'one night stand', 'online casino', 'online scam', 'onlyfans', 'orgasm', 'paid dating', 'penis', 'phishing', 'playboy', 'poker', 'porn', 'porn download', 'porn film', 'porn hub', 'porn site', 'porn video', 'private chat', 'prostitute', 'prostitution', 'racist', 'ransomware', 'rape', 'rave party', 'red light area', 'redtube', 'revenge porn', 'roulette', 'scam', 'secret affair', 'seduce', 'seduction', 'self harm', 'sex', 'sex ai', 'sex chat', 'sex game', 'sex movie', 'sex story', 'sext', 'sexting', 'shemale', 'shoot', 'slave', 'smoke', 'smoke shop', 'softcore', 'sports betting', 'stolen', 'stolen data', 'strip club', 'strip show', 'stripper', 'sugar baby', 'sugar daddy', 'sugar dating', 'suicide', 'suicide plan', 'taboo', 'teen porn', 'terrorist', 'threesome', 'tinder', 'torture', 'torture video', 'trans porn', 'vagina', 'vape', 'vape shop', 'video chat', 'violence', 'vodka', 'vodka shop', 'voyeur', 'war', 'war video', 'weapon', 'webcam', 'webcam chat', 'webcam show', 'weed', 'weed delivery', 'whiskey', 'whiskey shop', 'wine', 'xnxx', 'xvideos', 'xxx', 'youporn'
-  ];
+// StudyShield Background Service Worker (Manifest V3)
+// Handles zero-latency blocking, parental tamper protection, SafeSearch enforcement, Pomodoro timer, and streak analytics.
 
-// Default blocked domains for adult content (ALWAYS ACTIVE - hidden feature)
+// Default Adult & Harmful Domains (Always Active content filter)
 const defaultBlockedDomains = [
   'pornhub.com', 'xvideos.com', 'xnxx.com', 'redtube.com',
   'youporn.com', 'xhamster.com', 'porn.com', 'tube8.com',
@@ -11,270 +9,530 @@ const defaultBlockedDomains = [
   'xnxx.tv', 'beeg.com', 'porntrex.com', 'tnaflix.com',
   'youjizz.com', 'drtuber.com', 'nuvid.com', 'motherless.com',
   'upornia.com', '4tube.com', 'ixxx.com', 'sunporno.com',
-  'alphaporno.com', 'tube8.com', 'cam4.com', 'chaturbate.com',
+  'alphaporno.com', 'cam4.com', 'chaturbate.com',
   'livejasmin.com', 'bongacams.com', 'stripchat.com', 'camsoda.com',
   'onlyfans.com', 'fansly.com', 'justforfans.com', 'pornhd.com',
-  'empflix.com', 'redtube.com', 'porndig.com', 'fapality.com'
+  'empflix.com', 'porndig.com', 'fapality.com', 'brazzers.com',
+  'naughtyamerica.com', 'bangbros.com', 'realitykings.com',
+  'manyvids.com', 'camwhores.tv', 'erome.com', 'rule34.xxx'
 ];
 
-// Pre-listed distracting websites (can be toggled on/off by user)
+// Default Adult & Dangerous Keywords (Always Active)
+const defaultBlockedKeywords = [
+  '1xbet', 'abuse', 'adult ai', 'adult bot', 'adult cam', 'fuck', 'fucking',
+  'adult chat', 'adult dating', 'adult download', 'adult forum', 'adult game', 'adult video',
+  'affair', 'ai girlfriend', 'ai nude', 'anal sex', 'bangbros',
+  'bdsm', 'bet app', 'bet365', 'betting', 'blackjack', 'blackmail', 'blood video',
+  'blowjob', 'bong', 'boobs', 'brazzers', 'brothel', 'buy cocaine', 'buy heroin', 'buy weed',
+  'cam show', 'camgirl', 'cannabis', 'casino', 'chat sex', 'cocaine', 'credit card fraud',
+  'cybercrime', 'dark market', 'darkweb', 'dating', 'deepfake', 'deepweb',
+  'drug dealer', 'drug party', 'drugs online', 'ecstasy', 'erotic chat', 'erotic dance',
+  'erotic story', 'erotic video', 'escort service', 'explicit porn', 'extreme sex',
+  'fetish porn', 'fight club', 'free porn', 'gambling', 'gay porn', 'gay video', 'gaysex',
+  'grindr', 'group sex', 'guns for sale', 'hardcore porn', 'hentai video', 'heroin',
+  'hitman', 'hooker', 'hookup', 'hot porn', 'human trafficking', 'illegal drugs',
+  'incest porn', 'intercourse', 'lap dance', 'lesbian porn', 'lesbian video', 'live sex',
+  'lottery app', 'masturbate', 'meth drug', 'milf porn', 'murder video', 'naked girl',
+  'naked boy', 'narcotic', 'naughty america', 'night club escort', 'nsfw video', 'nude ai',
+  'nude chat', 'nude photo', 'one night stand', 'online casino', 'online scam', 'onlyfans leak',
+  'orgasm', 'paid dating', 'phishing scam', 'playboy', 'poker game', 'porn download',
+  'porn film', 'porn hub', 'porn site', 'porn video', 'private sex chat', 'prostitution',
+  'ransomware', 'rape video', 'red light area', 'redtube', 'revenge porn', 'roulette online',
+  'secret affair', 'seduction video', 'self harm', 'sex ai', 'sex chat', 'sex game',
+  'sex movie', 'sex story', 'sexting', 'shemale porn', 'sports betting', 'strip club',
+  'strip show', 'stripper', 'sugar baby', 'sugar daddy', 'suicide tutorial', 'teen porn',
+  'threesome', 'tinder', 'torture video', 'trans porn', 'vape online', 'video chat sex',
+  'webcam show', 'weed shop', 'xhamster', 'xnxx', 'xvideos', 'xxx video', 'youporn'
+];
+
+// Prelisted Distracting Websites (Grouped)
 const prelistedDistractingSites = [
   // Social Media
-  'snapchat.com', 'pinterest.com', 'linkedin.com', 'tumblr.com',
-  
+  'facebook.com', 'instagram.com', 'tiktok.com', 'twitter.com', 'x.com',
+  'snapchat.com', 'pinterest.com', 'tumblr.com', 'threads.net',
   // Video & Streaming
-  'hulu.com', 'twitch.tv', 'vimeo.com',
-  'dailymotion.com', 'disneyplus.com', 'hbomax.com', 'primevideo.com',
-  
+  'netflix.com', 'hulu.com', 'twitch.tv', 'vimeo.com', 'dailymotion.com',
+  'disneyplus.com', 'hbomax.com', 'max.com', 'primevideo.com',
   // Gaming
-  'steam.com', 'epicgames.com', 'twitch.tv', 'roblox.com', 'minecraft.net',
-  'leagueoflegends.com', 'fortnite.com', 'playstation.com', 'xbox.com',
-  
-  // News & Entertainment
-  'buzzfeed.com', 'cnn.com', 'bbc.com', 'espn.com', 'ign.com',
-  'kotaku.com', 'polygon.com', 'theverge.com', 'mashable.com',
-  
+  'roblox.com', 'minecraft.net', 'steamcommunity.com', 'store.steampowered.com',
+  'epicgames.com', 'leagueoflegends.com', 'fortnite.com', 'poki.com', 'crazygames.com',
   // Shopping
-  'amazon.com', 'ebay.com', 'etsy.com', 'aliexpress.com', 'wish.com',
-  'target.com', 'walmart.com', 'bestbuy.com',
-  
-  // Dating
-  'tinder.com', 'bumble.com', 'match.com', 'okcupid.com', 'hinge.co',
-  
-  // Forums & Communities
-  '4chan.org', '9gag.com', 'imgur.com', 'quora.com'
+  'amazon.com', 'aliexpress.com', 'ebay.com', 'shein.com', 'temu.com', 'etsy.com',
+  // Entertainment & Memes
+  '9gag.com', 'reddit.com', 'buzzfeed.com', 'imgur.com', '4chan.org'
 ];
 
-// Initialize default settings
-chrome.runtime.onInstalled.addListener(() => {
-  chrome.storage.local.get([
+// Temporary whitelist overrides allowed by Parent PIN (domain -> expiryTimestamp)
+let tempOverrides = new Map();
+
+// Helper: SHA-256 for secure PIN storage
+async function hashString(str) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(str);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// Format date YYYY-MM-DD
+function getTodayString() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+// Initialize default state
+chrome.runtime.onInstalled.addListener(async () => {
+  const data = await chrome.storage.local.get([
     'focusMode',
     'allowedWebsites',
     'permanentBlocked',
     'blockedKeywords',
     'timerDuration',
-    'timerEndTime',
     'usePrelistedSites',
-    'hasInitialized'
-  ], (data) => {
-    if (!data.focusMode) {
-      chrome.storage.local.set({ focusMode: false });
-    }
-    if (!data.allowedWebsites) {
-      chrome.storage.local.set({ allowedWebsites: [] });
-    }
-    if (!data.permanentBlocked) {
-      chrome.storage.local.set({ permanentBlocked: [] });
-    }
-    if (!data.blockedKeywords) {
-      chrome.storage.local.set({ blockedKeywords: [] });
-    }
-    if (!data.timerDuration) {
-      chrome.storage.local.set({ timerDuration: 25 });
-    }
-    // Initialize prelisted sites option (off by default)
-    if (data.usePrelistedSites === undefined) {
-      chrome.storage.local.set({ usePrelistedSites: false });
-    }
-  });
+    'adultShieldEnabled',
+    'parentalLockEnabled',
+    'parentPinHash',
+    'strictTamperGuard',
+    'safeSearchEnabled',
+    'soundscapesEnabled',
+    'streakStats',
+    'theme'
+  ]);
+
+  const defaultPinHash = await hashString('1234');
+
+  const updates = {};
+  if (data.focusMode === undefined) updates.focusMode = false;
+  if (!data.allowedWebsites) updates.allowedWebsites = ['wikipedia.org', 'khanacademy.org', 'google.com', 'classroom.google.com', 'coursera.org'];
+  if (!data.permanentBlocked) updates.permanentBlocked = [];
+  if (!data.blockedKeywords) updates.blockedKeywords = [];
+  if (!data.timerDuration) updates.timerDuration = 25;
+  if (data.usePrelistedSites === undefined) updates.usePrelistedSites = true;
+  if (data.adultShieldEnabled === undefined) updates.adultShieldEnabled = true;
+  if (data.parentalLockEnabled === undefined) updates.parentalLockEnabled = true;
+  if (!data.parentPinHash) updates.parentPinHash = defaultPinHash; // Default PIN 1234
+  if (data.strictTamperGuard === undefined) updates.strictTamperGuard = true;
+  if (data.safeSearchEnabled === undefined) updates.safeSearchEnabled = true;
+  if (data.soundscapesEnabled === undefined) updates.soundscapesEnabled = true;
+  if (!data.theme) updates.theme = 'dark';
+
+  if (!data.streakStats) {
+    updates.streakStats = {
+      streakCount: 1,
+      lastActiveDate: getTodayString(),
+      todayFocusMinutes: 0,
+      todayBlockedAttempts: 0,
+      totalFocusMinutes: 0,
+      xp: 50,
+      weeklyHistory: []
+    };
+  }
+
+  await chrome.storage.local.set(updates);
+
+  // Set uninstall feedback/alert URL
+  try {
+    chrome.runtime.setUninstallURL('https://forms.gle/StudyShieldFeedbackAlert');
+  } catch (e) {
+    // Ignore if not permitted
+  }
+
+  // Sync DeclarativeNetRequest Dynamic Rules for zero-latency blocking
+  await syncDeclarativeRules();
 });
 
-// Check if URL should be blocked
-function shouldBlockUrl(url, focusMode, allowedWebsites, permanentBlocked, usePrelistedSites) {
+// Sync DeclarativeNetRequest Rules
+async function syncDeclarativeRules() {
+  if (!chrome.declarativeNetRequest) return;
+
   try {
-    const urlObj = new URL(url);
-    const domain = urlObj.hostname.replace('www.', '');
-    
-    // ALWAYS CHECK ADULT CONTENT FIRST (this runs regardless of any settings)
-    // Check adult content domains
-    for (let blockedDomain of defaultBlockedDomains) {
-      if (domain.includes(blockedDomain) || blockedDomain.includes(domain)) {
-        return { block: true, reason: 'content_filter' };
-      }
+    const data = await chrome.storage.local.get([
+      'adultShieldEnabled',
+      'usePrelistedSites',
+      'permanentBlocked'
+    ]);
+
+    const domainsToBlock = new Set();
+
+    // 1. Adult domains if adult shield is active
+    if (data.adultShieldEnabled !== false) {
+      defaultBlockedDomains.forEach(d => domainsToBlock.add(d));
     }
-    
-    // Check if URL contains adult keywords in path or query
-    const fullUrl = url.toLowerCase();
-    for (let keyword of defaultBlockedKeywords) {
-      if (fullUrl.includes(keyword)) {
-        return { block: true, reason: 'content_filter' };
-      }
+
+    // 2. Prelisted distracting domains
+    if (data.usePrelistedSites) {
+      prelistedDistractingSites.forEach(d => domainsToBlock.add(d));
     }
-    
-    // Focus mode - only allow whitelisted sites
-    if (focusMode) {
-      const isAllowed = allowedWebsites.some(site => {
-        const cleanSite = site.replace('www.', '').toLowerCase();
-        return domain.includes(cleanSite) || cleanSite.includes(domain);
+
+    // 3. User permanently blocked domains
+    if (Array.isArray(data.permanentBlocked)) {
+      data.permanentBlocked.forEach(d => {
+        const clean = d.trim().replace(/^https?:\/\//i, '').replace('www.', '').split('/')[0].toLowerCase();
+        if (clean) domainsToBlock.add(clean);
       });
-      
-      if (!isAllowed) {
-        return { block: true, reason: 'focus_mode' };
+    }
+
+    // Remove any currently temporary overridden domains
+    const now = Date.now();
+    for (let [domain, expiry] of tempOverrides.entries()) {
+      if (expiry > now) {
+        domainsToBlock.delete(domain);
+      } else {
+        tempOverrides.delete(domain);
       }
     }
-    
-    // Check prelisted distracting sites if enabled
-    if (usePrelistedSites) {
-      const isPrelistedBlocked = prelistedDistractingSites.some(site => {
-        const cleanSite = site.replace('www.', '').toLowerCase();
-        return domain.includes(cleanSite) || cleanSite.includes(domain);
+
+    const blockedUrl = chrome.runtime.getURL('blocked.html');
+    const newRules = [];
+    let ruleId = 1;
+
+    for (let domain of domainsToBlock) {
+      if (ruleId > 4500) break; // Chrome DNR dynamic rule limit is 5000
+      newRules.push({
+        id: ruleId++,
+        priority: 1,
+        action: {
+          type: 'redirect',
+          redirect: { url: `${blockedUrl}?reason=site_blocked&domain=${encodeURIComponent(domain)}` }
+        },
+        condition: {
+          urlFilter: `||${domain}`,
+          resourceTypes: ['main_frame']
+        }
       });
-      
-      if (isPrelistedBlocked) {
-        return { block: true, reason: 'prelisted_block' };
-      }
     }
-    
-    // Permanent blocking
-    const isPermanentBlocked = permanentBlocked.some(site => {
-      const cleanSite = site.replace('www.', '').toLowerCase();
-      return domain.includes(cleanSite) || cleanSite.includes(domain);
+
+    const currentRules = await chrome.declarativeNetRequest.getDynamicRules();
+    const removeRuleIds = currentRules.map(r => r.id);
+
+    await chrome.declarativeNetRequest.updateDynamicRules({
+      removeRuleIds: removeRuleIds,
+      addRules: newRules
     });
-    
-    if (isPermanentBlocked) {
-      return { block: true, reason: 'permanent_block' };
-    }
-    
-    return { block: false };
-  } catch (e) {
-    return { block: false };
+  } catch (err) {
+    console.warn('DeclarativeNetRequest sync error:', err);
   }
 }
 
-// Check search queries for blocked keywords
-function checkSearchQuery(url) {
+// Log a blocked attempt in today's stats
+async function logBlockedAttempt(domain, reason) {
+  try {
+    const data = await chrome.storage.local.get(['streakStats']);
+    const stats = data.streakStats || {
+      streakCount: 1,
+      lastActiveDate: getTodayString(),
+      todayFocusMinutes: 0,
+      todayBlockedAttempts: 0,
+      totalFocusMinutes: 0,
+      xp: 0
+    };
+
+    const today = getTodayString();
+    if (stats.lastActiveDate !== today) {
+      stats.lastActiveDate = today;
+      stats.todayFocusMinutes = 0;
+      stats.todayBlockedAttempts = 0;
+    }
+
+    stats.todayBlockedAttempts = (stats.todayBlockedAttempts || 0) + 1;
+    stats.xp = (stats.xp || 0) + 2; // +2 XP for resisting distraction!
+
+    await chrome.storage.local.set({ streakStats: stats });
+  } catch (e) {
+    console.error('Error logging blocked attempt:', e);
+  }
+}
+
+// SafeSearch Enforcer: Google, Bing, DuckDuckGo, YouTube
+function checkSafeSearch(url) {
+  try {
+    const urlObj = new URL(url);
+    const host = urlObj.hostname.toLowerCase();
+
+    // Google SafeSearch
+    if (host.includes('google.') && urlObj.pathname.startsWith('/search')) {
+      if (urlObj.searchParams.get('safe') !== 'active') {
+        urlObj.searchParams.set('safe', 'active');
+        return urlObj.toString();
+      }
+    }
+
+    // Bing SafeSearch
+    if (host.includes('bing.com') && urlObj.pathname.startsWith('/search')) {
+      if (urlObj.searchParams.get('adlt') !== 'strict') {
+        urlObj.searchParams.set('adlt', 'strict');
+        return urlObj.toString();
+      }
+    }
+
+    // DuckDuckGo SafeSearch
+    if (host.includes('duckduckgo.com')) {
+      if (urlObj.searchParams.get('kp') !== '1') {
+        urlObj.searchParams.set('kp', '1');
+        return urlObj.toString();
+      }
+    }
+
+    return null;
+  } catch (e) {
+    return null;
+  }
+}
+
+// Check search queries for prohibited keywords
+function checkKeywordViolation(url, userKeywords = []) {
   try {
     const urlObj = new URL(url);
     const params = new URLSearchParams(urlObj.search);
-    
-    // Check common search parameter names
-    const searchParams = ['q', 'query', 'search', 's', 'text'];
-    
-    for (let param of searchParams) {
-      const query = params.get(param);
-      if (query) {
-        const lowerQuery = query.toLowerCase();
-        
-        // ALWAYS check adult keywords in searches (regardless of settings)
-        for (let keyword of defaultBlockedKeywords) {
-          if (lowerQuery.includes(keyword)) {
-            return true;
-          }
-        }
-        
-        // Check user-defined keywords
-        chrome.storage.local.get(['blockedKeywords'], (data) => {
-          const userKeywords = data.blockedKeywords || [];
-          for (let keyword of userKeywords) {
-            if (lowerQuery.includes(keyword.toLowerCase())) {
-              return true;
-            }
-          }
-        });
+    const searchKeys = ['q', 'query', 'search', 's', 'text', 'p', 'k'];
+
+    let fullQuery = '';
+    for (let key of searchKeys) {
+      const val = params.get(key);
+      if (val) fullQuery += ' ' + val.toLowerCase();
+    }
+
+    // Also check pathname
+    fullQuery += ' ' + urlObj.pathname.toLowerCase().replace(/[-_/]/g, ' ');
+
+    if (!fullQuery.trim()) return null;
+
+    // Check adult keywords
+    for (let kw of defaultBlockedKeywords) {
+      if (fullQuery.includes(kw)) {
+        return { violated: true, keyword: kw, reason: 'content_filter' };
       }
     }
-    
-    return false;
+
+    // Check user keywords
+    for (let kw of userKeywords) {
+      const cleanKw = kw.toLowerCase().trim();
+      if (cleanKw && fullQuery.includes(cleanKw)) {
+        return { violated: true, keyword: cleanKw, reason: 'keyword_filter' };
+      }
+    }
+
+    return null;
   } catch (e) {
-    return false;
+    return null;
   }
 }
 
-// Listen for tab updates
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  if (changeInfo.url) {
-    chrome.storage.local.get([
-      'focusMode',
-      'allowedWebsites',
-      'permanentBlocked',
-      'blockedKeywords',
-      'usePrelistedSites'
-    ], (data) => {
-      const result = shouldBlockUrl(
-        changeInfo.url,
-        data.focusMode,
-        data.allowedWebsites || [],
-        data.permanentBlocked || [],
-        data.usePrelistedSites || false
-      );
-      
-      const hasBlockedKeyword = checkSearchQuery(changeInfo.url);
-      
-      if (result.block || hasBlockedKeyword) {
+// Anti-Tamper & Tab Monitoring Listener
+chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+  if (!changeInfo.url) return;
+  const currentUrl = changeInfo.url;
+
+  const data = await chrome.storage.local.get([
+    'focusMode',
+    'allowedWebsites',
+    'permanentBlocked',
+    'blockedKeywords',
+    'usePrelistedSites',
+    'adultShieldEnabled',
+    'parentalLockEnabled',
+    'strictTamperGuard',
+    'safeSearchEnabled'
+  ]);
+
+  // 1. ANTI-TAMPER GUARDIAN: Block navigation to chrome://extensions or chrome://settings if strict mode is on
+  if (data.parentalLockEnabled && data.strictTamperGuard) {
+    const lowerUrl = currentUrl.toLowerCase();
+    if (lowerUrl.startsWith('chrome://extensions') || 
+        lowerUrl.startsWith('chrome://settings') || 
+        lowerUrl.startsWith('edge://extensions') ||
+        lowerUrl.startsWith('brave://extensions')) {
+      // Immediately redirect to Tamper Shield alert page
+      chrome.tabs.update(tabId, {
+        url: chrome.runtime.getURL('blocked.html?reason=tamper_shield')
+      });
+      chrome.notifications.create({
+        type: 'basic',
+        iconUrl: 'icon48.png',
+        title: '🛡️ StudyShield Parental Lock',
+        message: 'Extension settings are protected by Parent PIN and cannot be accessed or removed.'
+      });
+      return;
+    }
+  }
+
+  // 2. SafeSearch Enforcement
+  if (data.safeSearchEnabled !== false) {
+    const safeUrl = checkSafeSearch(currentUrl);
+    if (safeUrl && safeUrl !== currentUrl) {
+      chrome.tabs.update(tabId, { url: safeUrl });
+      return;
+    }
+  }
+
+  // Check temporary parent override
+  try {
+    const urlObj = new URL(currentUrl);
+    const domain = urlObj.hostname.replace('www.', '').toLowerCase();
+    if (tempOverrides.has(domain)) {
+      if (tempOverrides.get(domain) > Date.now()) {
+        return; // Temporarily allowed
+      } else {
+        tempOverrides.delete(domain);
+      }
+    }
+
+    // 3. Keyword Search Verification
+    const keywordResult = checkKeywordViolation(currentUrl, data.blockedKeywords || []);
+    if (keywordResult && keywordResult.violated) {
+      logBlockedAttempt(domain, keywordResult.reason);
+      chrome.tabs.update(tabId, {
+        url: chrome.runtime.getURL(`blocked.html?reason=${keywordResult.reason}&keyword=${encodeURIComponent(keywordResult.keyword)}`)
+      });
+      return;
+    }
+
+    // 4. Focus Mode Strict Whitelist
+    if (data.focusMode) {
+      const allowedList = data.allowedWebsites || [];
+      const isAllowed = allowedList.some(site => {
+        const cleanSite = site.replace(/^https?:\/\//i, '').replace('www.', '').toLowerCase();
+        return domain === cleanSite || domain.endsWith('.' + cleanSite);
+      });
+
+      if (!isAllowed && !currentUrl.startsWith('chrome-extension://') && !currentUrl.startsWith('chrome://')) {
+        logBlockedAttempt(domain, 'focus_mode');
         chrome.tabs.update(tabId, {
-          url: chrome.runtime.getURL('blocked.html') + '?reason=' + result.reason
+          url: chrome.runtime.getURL(`blocked.html?reason=focus_mode&domain=${encodeURIComponent(domain)}`)
         });
+        return;
       }
-    });
+    }
+  } catch (e) {
+    // Ignore invalid URLs
   }
 });
 
-// Listen for new tab creation
-chrome.tabs.onCreated.addListener((tab) => {
-  if (tab.url && tab.url !== 'chrome://newtab/') {
-    chrome.storage.local.get([
-      'focusMode',
-      'allowedWebsites',
-      'permanentBlocked',
-      'usePrelistedSites'
-    ], (data) => {
-      const result = shouldBlockUrl(
-        tab.url,
-        data.focusMode,
-        data.allowedWebsites || [],
-        data.permanentBlocked || [],
-        data.usePrelistedSites || false
-      );
-      
-      if (result.block) {
-        chrome.tabs.update(tab.id, {
-          url: chrome.runtime.getURL('blocked.html') + '?reason=' + result.reason
-        });
-      }
-    });
+// Also monitor newly created tabs for Anti-Tamper
+chrome.tabs.onCreated.addListener(async (tab) => {
+  if (!tab.url) return;
+  const data = await chrome.storage.local.get(['parentalLockEnabled', 'strictTamperGuard']);
+  if (data.parentalLockEnabled && data.strictTamperGuard) {
+    const lowerUrl = tab.url.toLowerCase();
+    if (lowerUrl.startsWith('chrome://extensions') || lowerUrl.startsWith('chrome://settings')) {
+      chrome.tabs.update(tab.id, {
+        url: chrome.runtime.getURL('blocked.html?reason=tamper_shield')
+      });
+    }
   }
 });
 
-// Timer management
-chrome.alarms.onAlarm.addListener((alarm) => {
+// Pomodoro Timer Alarm Handling
+chrome.alarms.onAlarm.addListener(async (alarm) => {
   if (alarm.name === 'focusTimer') {
-    // Timer ended, turn off focus mode
-    chrome.storage.local.set({ 
+    const data = await chrome.storage.local.get(['timerDuration', 'streakStats']);
+    const sessionMins = data.timerDuration || 25;
+
+    // Update streak stats & XP
+    const stats = data.streakStats || {
+      streakCount: 1,
+      lastActiveDate: getTodayString(),
+      todayFocusMinutes: 0,
+      todayBlockedAttempts: 0,
+      totalFocusMinutes: 0,
+      xp: 0
+    };
+
+    const today = getTodayString();
+    if (stats.lastActiveDate !== today) {
+      // Check if studied yesterday
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yesterdayStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, '0')}-${String(yesterday.getDate()).padStart(2, '0')}`;
+
+      if (stats.lastActiveDate === yesterdayStr) {
+        stats.streakCount = (stats.streakCount || 0) + 1;
+      } else {
+        stats.streakCount = 1;
+      }
+      stats.lastActiveDate = today;
+      stats.todayFocusMinutes = 0;
+      stats.todayBlockedAttempts = 0;
+    }
+
+    stats.todayFocusMinutes = (stats.todayFocusMinutes || 0) + sessionMins;
+    stats.totalFocusMinutes = (stats.totalFocusMinutes || 0) + sessionMins;
+    stats.xp = (stats.xp || 0) + 50; // +50 XP for completing a Pomodoro session!
+
+    await chrome.storage.local.set({
       focusMode: false,
-      timerEndTime: null 
+      timerEndTime: null,
+      timerState: 'completed',
+      streakStats: stats
     });
-    
-    // Notify user
+
+    // Notify User
     chrome.notifications.create({
       type: 'basic',
-      iconUrl: 'icon48.png',
-      title: 'Focus Session Complete',
-      message: 'Your focus session has ended!'
+      iconUrl: 'icon128.png',
+      title: '🎉 Focus Session Complete!',
+      message: `Outstanding! You completed ${sessionMins} minutes of laser-focused study. +50 XP earned!`
     });
   }
 });
 
-// Listen for messages from popup
+// Message Handling from Popups and Blocked Page
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.action === 'startTimer') {
-    const duration = request.duration;
-    const endTime = Date.now() + (duration * 60 * 1000);
-    
-    chrome.storage.local.set({ 
-      timerEndTime: endTime,
-      focusMode: true 
-    });
-    
-    chrome.alarms.create('focusTimer', { when: endTime });
-    sendResponse({ success: true });
-  } else if (request.action === 'stopTimer') {
-    chrome.alarms.clear('focusTimer');
-    chrome.storage.local.set({ 
-      timerEndTime: null,
-      focusMode: false 
-    });
-    sendResponse({ success: true });
-  }
-  
-  return true;
+  (async () => {
+    try {
+      if (request.action === 'startTimer') {
+        const duration = Number(request.duration) || 25;
+        const endTime = Date.now() + (duration * 60 * 1000);
+
+        await chrome.storage.local.set({
+          timerEndTime: endTime,
+          timerDuration: duration,
+          focusMode: true,
+          timerState: 'running'
+        });
+
+        chrome.alarms.create('focusTimer', { when: endTime });
+        sendResponse({ success: true, endTime });
+      } 
+      else if (request.action === 'stopTimer') {
+        chrome.alarms.clear('focusTimer');
+        await chrome.storage.local.set({
+          timerEndTime: null,
+          focusMode: false,
+          timerState: 'idle'
+        });
+        sendResponse({ success: true });
+      }
+      else if (request.action === 'syncRules') {
+        await syncDeclarativeRules();
+        sendResponse({ success: true });
+      }
+      else if (request.action === 'verifyPin') {
+        const inputHash = await hashString(request.pin);
+        const data = await chrome.storage.local.get(['parentPinHash']);
+        const isValid = inputHash === data.parentPinHash;
+        sendResponse({ valid: isValid });
+      }
+      else if (request.action === 'setNewPin') {
+        const newHash = await hashString(request.pin);
+        await chrome.storage.local.set({ parentPinHash: newHash });
+        sendResponse({ success: true });
+      }
+      else if (request.action === 'tempOverride') {
+        // Allow domain for 10 minutes
+        const domain = request.domain.replace('www.', '').toLowerCase();
+        tempOverrides.set(domain, Date.now() + (10 * 60 * 1000));
+        await syncDeclarativeRules();
+        sendResponse({ success: true });
+      }
+      else if (request.action === 'getTodayStats') {
+        const data = await chrome.storage.local.get(['streakStats']);
+        sendResponse({ stats: data.streakStats });
+      }
+    } catch (err) {
+      sendResponse({ success: false, error: err.message });
+    }
+  })();
+
+  return true; // Keep channel open for async response
 });

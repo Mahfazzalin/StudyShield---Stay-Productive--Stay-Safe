@@ -1,131 +1,318 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
+  <title>StudyShield</title>
   <style>
+    :root {
+      --bg-gradient: linear-gradient(145deg, #090d16 0%, #111827 50%, #0c101d 100%);
+      --card-bg: rgba(22, 30, 49, 0.7);
+      --card-border: rgba(99, 102, 241, 0.18);
+      --card-hover: rgba(30, 41, 67, 0.85);
+      --accent-indigo: #6366f1;
+      --accent-purple: #8b5cf6;
+      --accent-pink: #ec4899;
+      --accent-emerald: #10b981;
+      --accent-rose: #f43f5e;
+      --accent-amber: #f59e0b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --input-bg: rgba(15, 23, 42, 0.8);
+    }
+
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
+      user-select: none;
     }
-    
+
     body {
-      width: 420px;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: #333;
+      width: 430px;
+      height: 590px;
+      background: var(--bg-gradient);
+      color: var(--text-main);
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
     }
-    
+
+    /* Top Glow */
+    .ambient-glow {
+      position: absolute;
+      top: -60px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 320px;
+      height: 120px;
+      background: radial-gradient(ellipse, rgba(99, 102, 241, 0.3) 0%, transparent 70%);
+      filter: blur(35px);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Header */
     .header {
-      background: rgba(255, 255, 255, 0.95);
-      padding: 24px 24px 20px;
-      text-align: center;
-      border-bottom: 1px solid rgba(0,0,0,0.05);
-    }
-    
-    .header h1 {
-      font-size: 24px;
-      font-weight: 700;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin-bottom: 6px;
-    }
-    
-    .header p {
-      font-size: 13px;
-      color: #666;
-      font-weight: 500;
-    }
-    
-    .content {
-      background: #f8f9fa;
-      max-height: 500px;
-      overflow-y: auto;
-      padding-bottom: 10px;
-    }
-    
-    .content::-webkit-scrollbar {
-      width: 8px;
-    }
-    
-    .content::-webkit-scrollbar-track {
-      background: #e9ecef;
-    }
-    
-    .content::-webkit-scrollbar-thumb {
-      background: #cbd5e0;
-      border-radius: 4px;
-    }
-    
-    .content::-webkit-scrollbar-thumb:hover {
-      background: #a0aec0;
-    }
-    
-    /* Current Website Card */
-    .current-website {
-      background: white;
-      margin: 16px;
-      padding: 20px;
-      border-radius: 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-      border: 2px solid #e9ecef;
-    }
-    
-    .current-website h3 {
-      font-size: 14px;
-      font-weight: 600;
-      color: #495057;
-      margin-bottom: 12px;
+      padding: 16px 20px 12px;
       display: flex;
       align-items: center;
-      gap: 8px;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      background: rgba(11, 15, 25, 0.7);
+      backdrop-filter: blur(12px);
+      position: relative;
+      z-index: 10;
     }
-    
-    .website-info {
+
+    .brand {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 12px;
-      background: #f8f9fa;
-      border-radius: 12px;
-      margin-bottom: 14px;
+      gap: 10px;
     }
-    
-    .website-icon {
-      width: 32px;
-      height: 32px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      border-radius: 8px;
+
+    .brand-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
       display: flex;
       align-items: center;
       justify-content: center;
-      color: white;
+      font-size: 18px;
+      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
+    }
+
+    .brand-title {
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      background: linear-gradient(135deg, #ffffff 0%, #c7d2fe 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-badge {
+      font-size: 10px;
+      padding: 2px 6px;
+      background: rgba(99, 102, 241, 0.2);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      color: #a5b4fc;
+      border-radius: 6px;
+      font-weight: 700;
+    }
+
+    .header-streak {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(239, 68, 68, 0.15));
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      padding: 5px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #fbbf24;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .header-streak:hover {
+      transform: scale(1.04);
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.3);
+    }
+
+    /* Tab Navigation */
+    .tab-bar {
+      display: flex;
+      padding: 6px 12px;
+      background: rgba(15, 23, 42, 0.6);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      gap: 4px;
+      z-index: 10;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 8px 4px;
+      background: transparent;
+      border: none;
+      border-radius: 8px;
+      color: var(--text-muted);
+      font-size: 11.5px;
       font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .tab-btn span.tab-icon {
       font-size: 16px;
     }
-    
-    .website-name {
-      flex: 1;
-      font-size: 14px;
-      font-weight: 600;
-      color: #212529;
-      word-break: break-all;
+
+    .tab-btn:hover {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.05);
     }
-    
+
+    .tab-btn.active {
+      color: #818cf8;
+      background: rgba(99, 102, 241, 0.15);
+      box-shadow: inset 0 0 0 1px rgba(99, 102, 241, 0.3);
+    }
+
+    /* Main Scrollable Viewport */
+    .tab-viewport {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      position: relative;
+    }
+
+    .tab-viewport::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .tab-viewport::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.3);
+    }
+
+    .tab-viewport::-webkit-scrollbar-thumb {
+      background: rgba(99, 102, 241, 0.25);
+      border-radius: 3px;
+    }
+
+    .tab-viewport::-webkit-scrollbar-thumb:hover {
+      background: rgba(99, 102, 241, 0.45);
+    }
+
+    .tab-pane {
+      display: none;
+      animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .tab-pane.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Glass Cards */
+    .glass-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.35);
+      transition: all 0.2s;
+    }
+
+    .glass-card:hover {
+      border-color: rgba(99, 102, 241, 0.3);
+    }
+
+    /* Current Website Card */
+    .current-site-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .current-site-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-dim);
+      font-weight: 700;
+    }
+
+    .site-status-tag {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-weight: 600;
+    }
+
+    .status-allowed {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .status-blocked {
+      background: rgba(244, 63, 94, 0.15);
+      color: #fb7185;
+      border: 1px solid rgba(244, 63, 94, 0.3);
+    }
+
+    .status-neutral {
+      background: rgba(148, 163, 184, 0.15);
+      color: #94a3b8;
+    }
+
+    .current-site-content {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .site-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(168, 85, 247, 0.3));
+      border: 1px solid rgba(99, 102, 241, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 700;
+      color: #c7d2fe;
+    }
+
+    .site-details {
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .site-domain-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-main);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .site-meta {
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+
     .quick-actions {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
+      gap: 8px;
     }
-    
-    .quick-btn {
-      padding: 10px 16px;
+
+    .btn-quick {
+      padding: 8px 12px;
       border-radius: 10px;
-      border: 2px solid;
-      font-size: 13px;
-      font-weight: 600;
+      border: none;
+      font-size: 12px;
+      font-weight: 700;
       cursor: pointer;
       transition: all 0.2s;
       display: flex;
@@ -133,760 +320,783 @@
       justify-content: center;
       gap: 6px;
     }
-    
-    .quick-btn.allow {
-      background: #d4f8e8;
-      border-color: #10b981;
-      color: #047857;
+
+    .btn-allow {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
     }
-    
-    .quick-btn.allow:hover {
+
+    .btn-allow:hover {
       background: #10b981;
       color: white;
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
     }
-    
-    .quick-btn.block {
-      background: #ffe4e6;
-      border-color: #ef4444;
-      color: #dc2626;
+
+    .btn-block {
+      background: rgba(244, 63, 94, 0.15);
+      color: #fb7185;
+      border: 1px solid rgba(244, 63, 94, 0.3);
     }
-    
-    .quick-btn.block:hover {
-      background: #ef4444;
+
+    .btn-block:hover {
+      background: #f43f5e;
       color: white;
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
     }
-    
-    .quick-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none !important;
-    }
-    
-    /* Timer Section */
-    .timer-section {
-      background: white;
-      margin: 16px;
-      padding: 24px;
-      border-radius: 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    }
-    
-    .section-title {
-      font-size: 14px;
-      font-weight: 600;
-      color: #495057;
-      margin-bottom: 16px;
+
+    /* Circular Pomodoro Timer Display */
+    .timer-ring-container {
+      position: relative;
+      width: 170px;
+      height: 170px;
+      margin: 6px auto 14px;
       display: flex;
       align-items: center;
-      gap: 8px;
+      justify-content: center;
     }
-    
-    .timer-display {
-      font-size: 56px;
+
+    .timer-svg {
+      transform: rotate(-90deg);
+      width: 170px;
+      height: 170px;
+    }
+
+    .timer-circle-bg {
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.06);
+      stroke-width: 8;
+    }
+
+    .timer-circle-progress {
+      fill: none;
+      stroke: url(#timerGradient);
+      stroke-width: 8;
+      stroke-linecap: round;
+      stroke-dasharray: 471;
+      stroke-dashoffset: 0;
+      transition: stroke-dashoffset 1s linear;
+    }
+
+    .timer-center-text {
+      position: absolute;
       text-align: center;
-      font-weight: 700;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .timer-digits {
+      font-size: 38px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      font-variant-numeric: tabular-nums;
+      background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin: 20px 0;
-      font-variant-numeric: tabular-nums;
-      letter-spacing: 2px;
     }
-    
-    .timer-controls {
+
+    .timer-state-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #818cf8;
+      font-weight: 700;
+    }
+
+    /* Timer Presets */
+    .timer-presets {
       display: flex;
-      gap: 10px;
-      margin-bottom: 16px;
+      gap: 6px;
+      margin-bottom: 12px;
+      justify-content: center;
     }
-    
-    .timer-input {
-      flex: 1;
-      padding: 12px 16px;
-      border: 2px solid #e9ecef;
+
+    .preset-chip {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 5px 12px;
       border-radius: 12px;
-      font-size: 15px;
+      font-size: 12px;
       font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
       transition: all 0.2s;
-      background: #f8f9fa;
     }
-    
-    .timer-input:focus {
-      outline: none;
-      border-color: #667eea;
-      background: white;
+
+    .preset-chip:hover, .preset-chip.active {
+      background: rgba(99, 102, 241, 0.2);
+      border-color: rgba(99, 102, 241, 0.4);
+      color: #c7d2fe;
     }
-    
-    .btn {
-      padding: 12px 24px;
+
+    .timer-controls-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-main {
+      flex: 1;
+      padding: 12px;
       border: none;
       border-radius: 12px;
       font-size: 14px;
-      font-weight: 600;
+      font-weight: 700;
       cursor: pointer;
       transition: all 0.2s;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 6px;
     }
-    
-    .btn-primary {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+    .btn-start {
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
       color: white;
+      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
+    }
+
+    .btn-start:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.6);
+    }
+
+    .btn-stop {
+      background: rgba(244, 63, 94, 0.15);
+      color: #fb7185;
+      border: 1px solid rgba(244, 63, 94, 0.3);
+    }
+
+    .btn-stop:hover {
+      background: #f43f5e;
+      color: white;
+    }
+
+    /* Soundscapes Box */
+    .soundscape-row {
+      display: flex;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .sound-chip {
       flex: 1;
+      padding: 7px 4px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
     }
-    
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+
+    .sound-chip.active {
+      background: rgba(16, 185, 129, 0.15);
+      border-color: rgba(16, 185, 129, 0.4);
+      color: #34d399;
     }
-    
-    .btn-danger {
-      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-      color: white;
-    }
-    
-    .btn-danger:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
-    }
-    
-    .btn-small {
-      padding: 8px 16px;
-      font-size: 13px;
-    }
-    
-    .btn-secondary {
-      background: white;
-      color: #495057;
-      border: 2px solid #e9ecef;
-    }
-    
-    .btn-secondary:hover {
-      background: #f8f9fa;
-      border-color: #667eea;
-      color: #667eea;
-    }
-    
-    /* Toggle Switch */
-    .toggle-card {
-      background: white;
-      margin: 16px;
-      padding: 20px;
-      border-radius: 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    }
-    
+
+    /* Toggle switches */
     .toggle-row {
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
     }
-    
-    .toggle-label {
+
+    .toggle-row:last-child {
+      border-bottom: none;
+    }
+
+    .toggle-info {
+      flex: 1;
+      padding-right: 12px;
+    }
+
+    .toggle-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-main);
       display: flex;
       align-items: center;
-      gap: 10px;
-      font-size: 15px;
-      font-weight: 600;
-      color: #212529;
+      gap: 6px;
     }
-    
-    .toggle-label-icon {
-      font-size: 20px;
-    }
-    
+
     .toggle-desc {
-      margin-top: 12px;
-      padding-top: 12px;
-      border-top: 1px solid #e9ecef;
-      font-size: 12px;
-      color: #6c757d;
-      line-height: 1.5;
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-top: 2px;
     }
-    
+
     .switch {
       position: relative;
       display: inline-block;
-      width: 56px;
-      height: 32px;
+      width: 42px;
+      height: 24px;
+      flex-shrink: 0;
     }
-    
+
     .switch input {
       opacity: 0;
       width: 0;
       height: 0;
     }
-    
+
     .slider {
       position: absolute;
       cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: #e9ecef;
+      inset: 0;
+      background-color: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.15);
       transition: 0.3s;
-      border-radius: 32px;
+      border-radius: 24px;
     }
-    
+
     .slider:before {
       position: absolute;
       content: "";
-      height: 24px;
-      width: 24px;
-      left: 4px;
-      bottom: 4px;
-      background: white;
+      height: 16px;
+      width: 16px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
       transition: 0.3s;
       border-radius: 50%;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
-    
+
     input:checked + .slider {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background-color: #6366f1;
+      border-color: #818cf8;
     }
-    
+
     input:checked + .slider:before {
-      transform: translateX(24px);
+      transform: translateX(18px);
     }
-    
-    /* List Sections */
-    .list-card {
-      background: white;
-      margin: 16px;
-      padding: 20px;
-      border-radius: 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    }
-    
-    .list-header {
+
+    /* Input with Button */
+    .input-row {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
+      gap: 8px;
+      margin-top: 10px;
     }
-    
-    .badge {
-      background: #e9ecef;
-      color: #495057;
-      padding: 4px 10px;
-      border-radius: 12px;
+
+    .text-input {
+      flex: 1;
+      background: var(--input-bg);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: 12.5px;
+      color: white;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .text-input:focus {
+      border-color: var(--accent-indigo);
+      box-shadow: 0 0 10px rgba(99, 102, 241, 0.2);
+    }
+
+    .btn-add {
+      background: rgba(99, 102, 241, 0.25);
+      border: 1px solid rgba(99, 102, 241, 0.4);
+      color: #c7d2fe;
+      border-radius: 10px;
+      padding: 8px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-add:hover {
+      background: #6366f1;
+      color: white;
+    }
+
+    /* Chips container */
+    .chips-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+      max-height: 110px;
+      overflow-y: auto;
+      padding: 2px;
+    }
+
+    .chip-item {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 4px 8px;
+      font-size: 11.5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #e2e8f0;
+    }
+
+    .chip-remove {
+      color: #94a3b8;
+      cursor: pointer;
+      font-weight: bold;
+      transition: color 0.15s;
+    }
+
+    .chip-remove:hover {
+      color: #f43f5e;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .stat-card {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 14px;
+      padding: 12px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 22px;
+      font-weight: 800;
+      color: white;
+      margin-top: 2px;
+    }
+
+    .stat-title {
+      font-size: 11px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 700;
+    }
+
+    /* Parental Zone Fortress Banner */
+    .fortress-banner {
+      background: linear-gradient(135deg, rgba(244, 63, 94, 0.12) 0%, rgba(168, 85, 247, 0.12) 100%);
+      border: 1px solid rgba(244, 63, 94, 0.3);
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+
+    .fortress-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13.5px;
+      font-weight: 800;
+      color: #fda4af;
+      margin-bottom: 6px;
+    }
+
+    .fortress-text {
+      font-size: 11.5px;
+      color: #cbd5e1;
+      line-height: 1.4;
+      margin-bottom: 10px;
+    }
+
+    /* PIN Gate Modal */
+    .pin-gate {
+      position: absolute;
+      inset: 0;
+      background: rgba(7, 11, 20, 0.95);
+      backdrop-filter: blur(12px);
+      z-index: 50;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+    }
+
+    .pin-gate.active {
+      display: flex;
+    }
+
+    /* Toast */
+    .toast-msg {
+      position: absolute;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%) translateY(50px);
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
       font-size: 12px;
       font-weight: 600;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 100;
+      pointer-events: none;
+      opacity: 0;
     }
-    
-    .input-group {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-    
-    .input-field {
-      flex: 1;
-      padding: 10px 14px;
-      border: 2px solid #e9ecef;
-      border-radius: 10px;
-      font-size: 14px;
-      transition: all 0.2s;
-      background: #f8f9fa;
-    }
-    
-    .input-field:focus {
-      outline: none;
-      border-color: #667eea;
-      background: white;
-    }
-    
-    .input-field::placeholder {
-      color: #adb5bd;
-    }
-    
-    .list-items {
-      max-height: 160px;
-      overflow-y: auto;
-      margin-top: 12px;
-    }
-    
-    .list-items::-webkit-scrollbar {
-      width: 6px;
-    }
-    
-    .list-items::-webkit-scrollbar-track {
-      background: #f8f9fa;
-      border-radius: 3px;
-    }
-    
-    .list-items::-webkit-scrollbar-thumb {
-      background: #cbd5e0;
-      border-radius: 3px;
-    }
-    
-    .list-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 14px;
-      background: #f8f9fa;
-      margin-bottom: 8px;
-      border-radius: 10px;
-      transition: all 0.2s;
-      border: 2px solid transparent;
-    }
-    
-    .list-item:hover {
-      background: #e9ecef;
-      border-color: #667eea;
-    }
-    
-    .list-item:last-child {
-      margin-bottom: 0;
-    }
-    
-    .item-text {
-      flex: 1;
-      font-size: 13px;
-      font-weight: 500;
-      color: #495057;
-      word-break: break-all;
-    }
-    
-    .item-buttons {
-      display: flex;
-      gap: 6px;
-    }
-    
-    .icon-btn {
-      width: 32px;
-      height: 32px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-    }
-    
-    .icon-btn.edit {
-      background: #dbeafe;
-      color: #1e40af;
-    }
-    
-    .icon-btn.edit:hover {
-      background: #3b82f6;
-      color: white;
-      transform: scale(1.1);
-    }
-    
-    .icon-btn.delete {
-      background: #fee2e2;
-      color: #991b1b;
-    }
-    
-    .icon-btn.delete:hover {
-      background: #ef4444;
-      color: white;
-      transform: scale(1.1);
-    }
-    
-    .empty-state {
-      text-align: center;
-      padding: 32px 16px;
-      color: #868e96;
-      font-size: 13px;
-    }
-    
-    .empty-state-icon {
-      font-size: 48px;
-      margin-bottom: 12px;
-      opacity: 0.5;
-    }
-    
-    /* Status Toast */
-    .toast {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%) translateY(100px);
-      background: white;
-      padding: 14px 20px;
-      border-radius: 12px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-      font-size: 14px;
-      font-weight: 600;
-      transition: transform 0.3s;
-      z-index: 1000;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      min-width: 250px;
-    }
-    
-    .toast.show {
+
+    .toast-msg.show {
       transform: translateX(-50%) translateY(0);
-    }
-    
-    .toast.success {
-      border-left: 4px solid #10b981;
-      color: #047857;
-    }
-    
-    .toast.error {
-      border-left: 4px solid #ef4444;
-      color: #dc2626;
-    }
-    
-    .toast-icon {
-      font-size: 20px;
-    }
-    
-    /* Modal for prelisted sites */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.7);
-      z-index: 2000;
-      animation: fadeIn 0.3s;
-    }
-    
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-    
-    .modal.show {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    
-    .modal-content {
-      background: white;
-      border-radius: 20px;
-      padding: 30px;
-      max-width: 500px;
-      width: 90%;
-      max-height: 80vh;
-      overflow-y: auto;
-      animation: slideUp 0.3s;
-    }
-    
-    @keyframes slideUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-    
-    .modal-title {
-      font-size: 20px;
-      font-weight: 700;
-      color: #212529;
-    }
-    
-    .modal-close {
-      width: 36px;
-      height: 36px;
-      border: none;
-      background: #f8f9fa;
-      border-radius: 50%;
-      cursor: pointer;
-      font-size: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s;
-    }
-    
-    .modal-close:hover {
-      background: #e9ecef;
-      transform: rotate(90deg);
-    }
-    
-    .category-section {
-      margin-bottom: 24px;
-    }
-    
-    .category-title {
-      font-size: 15px;
-      font-weight: 600;
-      color: #495057;
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    
-    .site-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 8px;
-    }
-    
-    .site-tag {
-      background: #f8f9fa;
-      padding: 8px 12px;
-      border-radius: 8px;
-      font-size: 13px;
-      color: #495057;
-      border: 1px solid #e9ecef;
+      opacity: 1;
     }
   </style>
 </head>
 <body>
+  <div class="ambient-glow"></div>
+
+  <!-- SVG Gradient definition for circular timer -->
+  <svg style="position: absolute; width: 0; height: 0;">
+    <defs>
+      <linearGradient id="timerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#6366f1" />
+        <stop offset="100%" stop-color="#ec4899" />
+      </linearGradient>
+    </defs>
+  </svg>
+
+  <!-- Header -->
   <div class="header">
-    <h1>🎯 Focus Timer</h1>
-    <p>Stay focused, stay productive</p>
-  </div>
-  
-  <div class="content">
-    <!-- Current Website -->
-    <div class="current-website" id="currentWebsiteCard">
-      <h3><span>🌐</span> Current Website</h3>
-      <div class="website-info">
-        <div class="website-icon" id="websiteIcon">?</div>
-        <div class="website-name" id="websiteName">Loading...</div>
+    <div class="brand">
+      <div class="brand-icon">🛡️</div>
+      <div>
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <span class="brand-title">StudyShield</span>
+          <span class="brand-badge">PRO v2.0</span>
+        </div>
       </div>
-      <div class="quick-actions">
-        <button class="quick-btn allow" id="quickAllow">
-          <span>✓</span> Allow
+    </div>
+    <div class="header-streak" id="streakBadge" title="Daily study streak! Keep studying to maintain your streak.">
+      <span>🔥</span>
+      <span id="streakCount">1 Day</span>
+    </div>
+  </div>
+
+  <!-- Tab Bar -->
+  <div class="tab-bar">
+    <button class="tab-btn active" data-tab="tab-dashboard">
+      <span class="tab-icon">🏠</span>
+      <span>Home</span>
+    </button>
+    <button class="tab-btn" data-tab="tab-focus">
+      <span class="tab-icon">⏱️</span>
+      <span>Focus</span>
+    </button>
+    <button class="tab-btn" data-tab="tab-shield">
+      <span class="tab-icon">🛡️</span>
+      <span>Shield</span>
+    </button>
+    <button class="tab-btn" data-tab="tab-parents">
+      <span class="tab-icon">👨‍👩‍👧</span>
+      <span>Parents</span>
+    </button>
+    <button class="tab-btn" data-tab="tab-stats">
+      <span class="tab-icon">📊</span>
+      <span>Stats</span>
+    </button>
+  </div>
+
+  <!-- Viewport -->
+  <div class="tab-viewport">
+    
+    <!-- TAB 1: DASHBOARD -->
+    <div class="tab-pane active" id="tab-dashboard">
+      <!-- Current Website Card -->
+      <div class="glass-card">
+        <div class="current-site-header">
+          <span class="current-site-title">Current Tab</span>
+          <span class="site-status-tag status-neutral" id="currentSiteTag">Checking...</span>
+        </div>
+        <div class="current-site-content">
+          <div class="site-avatar" id="currentSiteIcon">🌐</div>
+          <div class="site-details">
+            <div class="site-domain-name" id="currentSiteDomain">Scanning tab...</div>
+            <div class="site-meta" id="currentSiteMeta">Active tab status</div>
+          </div>
+        </div>
+        <div class="quick-actions">
+          <button class="btn-quick btn-allow" id="quickAllowBtn">
+            <span>✓</span> Allow Domain
+          </button>
+          <button class="btn-quick btn-block" id="quickBlockBtn">
+            <span>✕</span> Block Domain
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Focus Status -->
+      <div class="glass-card" style="display: flex; align-items: center; justify-content: space-between;">
+        <div>
+          <div style="font-size: 14px; font-weight: 700;" id="dashTimerTitle">Focus Session</div>
+          <div style="font-size: 11.5px; color: var(--text-muted);" id="dashTimerSub">Not running</div>
+        </div>
+        <button class="btn-quick btn-allow" id="dashStartBtn" style="padding: 8px 16px;">
+          <span>▶</span> Start 25m
         </button>
-        <button class="quick-btn block" id="quickBlock">
-          <span>✕</span> Block
+      </div>
+
+      <!-- Overview Stats Grid -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-title">Focus Today</div>
+          <div class="stat-value" id="dashFocusMins">0 min</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">Blocked Today</div>
+          <div class="stat-value" id="dashBlockedCount">0</div>
+        </div>
+      </div>
+
+      <!-- Motivational Quote Banner -->
+      <div class="glass-card" style="padding: 12px 14px; font-size: 12px; color: #cbd5e1; font-style: italic;">
+        <span id="dashQuote">"Starve your distractions, feed your focus."</span>
+      </div>
+    </div>
+
+    <!-- TAB 2: FOCUS (POMODORO 2.0) -->
+    <div class="tab-pane" id="tab-focus">
+      <div class="glass-card" style="text-align: center;">
+        <div class="timer-ring-container">
+          <svg class="timer-svg" viewBox="0 0 170 170">
+            <circle class="timer-circle-bg" cx="85" cy="85" r="75" />
+            <circle class="timer-circle-progress" id="timerProgressRing" cx="85" cy="85" r="75" />
+          </svg>
+          <div class="timer-center-text">
+            <div class="timer-digits" id="timerDisplay">25:00</div>
+            <div class="timer-state-label" id="timerModeLabel">READY</div>
+          </div>
+        </div>
+
+        <div class="timer-presets">
+          <button class="preset-chip" data-mins="15">15m</button>
+          <button class="preset-chip active" data-mins="25">25m</button>
+          <button class="preset-chip" data-mins="45">45m</button>
+          <button class="preset-chip" data-mins="60">60m</button>
+        </div>
+
+        <div class="timer-controls-row">
+          <button class="btn-main btn-start" id="startTimerBtn">
+            <span>▶</span> Start Focus
+          </button>
+          <button class="btn-main btn-stop" id="stopTimerBtn" style="display: none;">
+            <span>⏹</span> Stop
+          </button>
+        </div>
+      </div>
+
+      <!-- Ambient Soundscapes -->
+      <div class="glass-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <span class="current-site-title">🎧 Ambient Focus Soundscapes</span>
+          <span style="font-size: 11px; color: var(--text-dim);" id="audioStatus">Off</span>
+        </div>
+        <div class="soundscape-row">
+          <button class="sound-chip" data-sound="rain">🌧️ Rain</button>
+          <button class="sound-chip" data-sound="whitenoise">📻 White Noise</button>
+          <button class="sound-chip" data-sound="cafe">☕ Cafe</button>
+          <button class="sound-chip" data-sound="off">⏹ Off</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: SHIELD & RULES -->
+    <div class="tab-pane" id="tab-shield">
+      <div class="glass-card">
+        <!-- Adult Content Shield Toggle -->
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-title">
+              <span>🔞 Adult & Harmful Filter</span>
+            </div>
+            <div class="toggle-desc">Blocks 100+ adult domains, explicit content, and searches.</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="adultShieldToggle" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <!-- Distracting Sites Blocker Toggle -->
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-title">
+              <span>📋 Block Distracting Sites</span>
+            </div>
+            <div class="toggle-desc">Auto-blocks social media, gaming, video streaming & memes.</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="prelistedToggle" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <!-- Focus Mode Toggle -->
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-title">
+              <span>🎯 Strict Focus Whitelist</span>
+            </div>
+            <div class="toggle-desc">Only allowed educational websites can be opened.</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="focusModeToggle">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Custom Blocked Domains -->
+      <div class="glass-card">
+        <div class="current-site-title">🚫 Custom Blocked Websites (<span id="blockedSitesCount">0</span>)</div>
+        <div class="input-row">
+          <input type="text" class="text-input" id="newBlockedInput" placeholder="e.g. reddit.com">
+          <button class="btn-add" id="addBlockedBtn">Block</button>
+        </div>
+        <div class="chips-container" id="blockedChips"></div>
+      </div>
+
+      <!-- Allowed Websites Whitelist -->
+      <div class="glass-card">
+        <div class="current-site-title">✅ Allowed Whitelist (<span id="allowedSitesCount">0</span>)</div>
+        <div class="input-row">
+          <input type="text" class="text-input" id="newAllowedInput" placeholder="e.g. khanacademy.org">
+          <button class="btn-add" id="addAllowedBtn">Allow</button>
+        </div>
+        <div class="chips-container" id="allowedChips"></div>
+      </div>
+
+      <!-- Blocked Keywords -->
+      <div class="glass-card">
+        <div class="current-site-title">🔍 Blocked Search Keywords (<span id="keywordsCount">0</span>)</div>
+        <div class="input-row">
+          <input type="text" class="text-input" id="newKeywordInput" placeholder="e.g. games, gambling">
+          <button class="btn-add" id="addKeywordBtn">Add</button>
+        </div>
+        <div class="chips-container" id="keywordChips"></div>
+      </div>
+    </div>
+
+    <!-- TAB 4: PARENTS (TAMPER DEFENSE & ANTI-UNINSTALL) -->
+    <div class="tab-pane" id="tab-parents">
+      <!-- Fortress Mode Banner -->
+      <div class="fortress-banner">
+        <div class="fortress-header">
+          <span>🏰</span>
+          <span>1-Click Anti-Uninstall Fortress</span>
+        </div>
+        <p class="fortress-text">
+          Want to prevent children from removing this extension completely? Run the Windows Enterprise Policy script to permanently lock StudyShield into Chrome.
+        </p>
+        <button class="btn-quick btn-block" id="downloadFortressBtn" style="width: 100%; padding: 10px;">
+          <span>🔒</span> Download 1-Click Anti-Uninstall File (.reg)
         </button>
       </div>
-    </div>
-    
-    <!-- Timer Section -->
-    <div class="timer-section">
-      <h3 class="section-title"><span>⏱️</span> Focus Timer</h3>
-      <div class="timer-display" id="timerDisplay">25:00</div>
-      <div class="timer-controls">
-        <input type="number" id="timerDuration" class="timer-input" min="1" max="180" value="25" placeholder="Minutes">
-        <button class="btn btn-primary" id="startTimer">
-          <span>▶</span> Start
-        </button>
-      </div>
-      <button class="btn btn-danger" id="stopTimer" style="width: 100%;">
-        <span>⏹</span> Stop Timer
-      </button>
-    </div>
-    
-    <!-- Focus Mode Toggle -->
-    <div class="toggle-card">
-      <div class="toggle-row">
-        <div class="toggle-label">
-          <span class="toggle-label-icon">🔒</span>
-          <span>Focus Mode</span>
+
+      <!-- Parental Settings -->
+      <div class="glass-card">
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-title">
+              <span>🛡️ Strict Anti-Tamper Guardian</span>
+            </div>
+            <div class="toggle-desc">Blocks access to chrome://extensions and settings.</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="tamperGuardToggle" checked>
+            <span class="slider"></span>
+          </label>
         </div>
-        <label class="switch">
-          <input type="checkbox" id="focusModeToggle">
-          <span class="slider"></span>
-        </label>
-      </div>
-    </div>
-    
-    <!-- Prelisted Sites Toggle -->
-    <div class="toggle-card">
-      <div class="toggle-row">
-        <div class="toggle-label">
-          <span class="toggle-label-icon">📋</span>
-          <span>Block Distracting Sites</span>
+
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-title">
+              <span>🔍 Enforce SafeSearch</span>
+            </div>
+            <div class="toggle-desc">Forces Strict SafeSearch on Google, Bing & DuckDuckGo.</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="safeSearchToggle" checked>
+            <span class="slider"></span>
+          </label>
         </div>
-        <label class="switch">
-          <input type="checkbox" id="prelistedToggle">
-          <span class="slider"></span>
-        </label>
       </div>
-      <div class="toggle-desc">
-        <strong>Blocks 60+ distracting sites:</strong> Social networks, video streaming, gaming portals, shopping sites, dating apps, and more.
+
+      <!-- Change PIN -->
+      <div class="glass-card">
+        <div class="current-site-title">🔑 Change Parent Master PIN</div>
+        <div class="input-row">
+          <input type="password" maxlength="6" class="text-input" id="newPinInput" placeholder="New 4-digit PIN">
+          <button class="btn-add" id="savePinBtn">Update PIN</button>
+        </div>
+        <div style="font-size: 11px; color: var(--text-dim); margin-top: 6px;">
+          Default PIN is <strong>1234</strong>. Keep this secret from children.
+        </div>
       </div>
     </div>
-    
-    <!-- View Prelisted Sites Button -->
-    <div style="margin: 16px; margin-top: 0;">
-      <button id="viewPrelistedBtn" class="btn btn-secondary" style="width: 100%; padding: 12px;">
-        <span>📝</span> View All Blocked Sites
-      </button>
+
+    <!-- TAB 5: STATS & XP -->
+    <div class="tab-pane" id="tab-stats">
+      <!-- XP & Level Card -->
+      <div class="glass-card" style="text-align: center;">
+        <div style="font-size: 11px; text-transform: uppercase; color: var(--text-dim); font-weight: 700;">Productivity Rank</div>
+        <div style="font-size: 20px; font-weight: 800; color: #a5b4fc; margin: 4px 0;" id="statsLevelName">Focus Scholar</div>
+        <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">
+          Level <span id="statsLevelNum">1</span> • <span id="statsXp">50</span> XP
+        </div>
+        <div style="background: rgba(255, 255, 255, 0.08); height: 8px; border-radius: 4px; overflow: hidden;">
+          <div id="statsXpBar" style="background: linear-gradient(90deg, #6366f1, #ec4899); height: 100%; width: 30%;"></div>
+        </div>
+      </div>
+
+      <!-- Total Stats -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-title">Study Streak</div>
+          <div class="stat-value" id="statsStreakVal">🔥 1 Day</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">Total Study Time</div>
+          <div class="stat-value" id="statsTotalTimeVal">0 hrs</div>
+        </div>
+      </div>
+
+      <!-- Estimated Time Saved -->
+      <div class="glass-card">
+        <div class="current-site-title">⏳ Estimated Time Saved</div>
+        <div style="font-size: 18px; font-weight: 800; color: #34d399; margin: 6px 0;" id="statsTimeSavedVal">~0 hrs</div>
+        <div style="font-size: 11px; color: var(--text-dim);">
+          Calculated from resisted distractions and uninterrupted Pomodoro sessions.
+        </div>
+      </div>
     </div>
-    
-    <!-- Allowed Websites -->
-    <div class="list-card">
-      <div class="list-header">
-        <h3 class="section-title" style="margin: 0;"><span>✅</span> Allowed Sites</h3>
-        <span class="badge" id="allowedCount">0</span>
-      </div>
-      <div class="input-group">
-        <input type="text" id="allowedInput" class="input-field" placeholder="example.com">
-        <button class="btn btn-primary btn-small" id="addAllowed">Add</button>
-      </div>
-      <div class="list-items" id="allowedList"></div>
-    </div>
-    
-    <!-- Blocked Websites -->
-    <div class="list-card">
-      <div class="list-header">
-        <h3 class="section-title" style="margin: 0;"><span>🚫</span> Blocked Sites</h3>
-        <span class="badge" id="blockedCount">0</span>
-      </div>
-      <div class="input-group">
-        <input type="text" id="blockedInput" class="input-field" placeholder="example.com">
-        <button class="btn btn-primary btn-small" id="addBlocked">Add</button>
-      </div>
-      <div class="list-items" id="blockedList"></div>
-    </div>
-    
-    <!-- Blocked Keywords -->
-    <div class="list-card">
-      <div class="list-header">
-        <h3 class="section-title" style="margin: 0;"><span>🔍</span> Blocked Keywords</h3>
-        <span class="badge" id="keywordCount">0</span>
-      </div>
-      <div class="input-group">
-        <input type="text" id="keywordInput" class="input-field" placeholder="keyword">
-        <button class="btn btn-primary btn-small" id="addKeyword">Add</button>
-      </div>
-      <div class="list-items" id="keywordList"></div>
+
+  </div>
+
+  <!-- PIN Protection Gate (Modal for sensitive tabs) -->
+  <div class="pin-gate" id="pinGate">
+    <div style="font-size: 38px; margin-bottom: 12px;">🔒</div>
+    <h2 style="font-size: 18px; font-weight: 700; margin-bottom: 6px;">Parent Access Required</h2>
+    <p style="font-size: 12.5px; color: var(--text-muted); max-width: 260px; margin-bottom: 18px;">
+      This section is locked to prevent unauthorized changes by children.
+    </p>
+    <input type="password" maxlength="6" class="text-input" id="gatePinInput" placeholder="••••" style="text-align: center; font-size: 22px; letter-spacing: 6px; width: 160px; margin-bottom: 12px;">
+    <div style="color: var(--accent-rose); font-size: 12px; margin-bottom: 12px; display: none;" id="gatePinError">Incorrect PIN.</div>
+    <div style="display: flex; gap: 8px;">
+      <button class="btn-quick" id="cancelGateBtn" style="background: rgba(255,255,255,0.1); color: white; padding: 8px 16px;">Cancel</button>
+      <button class="btn-quick btn-allow" id="submitGateBtn" style="padding: 8px 20px;">Unlock</button>
     </div>
   </div>
-  
-  <div class="toast" id="toast">
-    <span class="toast-icon" id="toastIcon"></span>
-    <span id="toastMessage"></span>
-  </div>
-  
-  <!-- Prelisted Sites Modal -->
-  <div class="modal" id="prelistedModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2 class="modal-title">📋 Prelisted Blocked Sites</h2>
-        <button class="modal-close" id="closeModal">✕</button>
-      </div>
-      
-      <div class="category-section">
-        <div class="category-title">📱 Social Networks (10 sites)</div>
-        <div class="site-grid">
-          <div class="site-tag">Social Site #1</div>
-          <div class="site-tag">Social Site #2</div>
-          <div class="site-tag">Social Site #3</div>
-          <div class="site-tag">Social Site #4</div>
-          <div class="site-tag">Social Site #5</div>
-          <div class="site-tag">Social Site #6</div>
-          <div class="site-tag">Social Site #7</div>
-          <div class="site-tag">Social Site #8</div>
-          <div class="site-tag">Social Site #9</div>
-          <div class="site-tag">Social Site #10</div>
-        </div>
-      </div>
-      
-      <div class="category-section">
-        <div class="category-title">🎬 Video Streaming (9 sites)</div>
-        <div class="site-grid">
-          <div class="site-tag">Video Site #1</div>
-          <div class="site-tag">Video Site #2</div>
-          <div class="site-tag">Video Site #3</div>
-          <div class="site-tag">Video Site #4</div>
-          <div class="site-tag">Video Site #5</div>
-          <div class="site-tag">Video Site #6</div>
-          <div class="site-tag">Video Site #7</div>
-          <div class="site-tag">Video Site #8</div>
-          <div class="site-tag">Video Site #9</div>
-        </div>
-      </div>
-      
-      <div class="category-section">
-        <div class="category-title">🎮 Gaming (9 sites)</div>
-        <div class="site-grid">
-          <div class="site-tag">Gaming Site #1</div>
-          <div class="site-tag">Gaming Site #2</div>
-          <div class="site-tag">Gaming Site #3</div>
-          <div class="site-tag">Gaming Site #4</div>
-          <div class="site-tag">Gaming Site #5</div>
-          <div class="site-tag">Gaming Site #6</div>
-          <div class="site-tag">Gaming Site #7</div>
-          <div class="site-tag">Gaming Site #8</div>
-          <div class="site-tag">Gaming Site #9</div>
-        </div>
-      </div>
-      
-      <div class="category-section">
-        <div class="category-title">📰 News & Entertainment (9 sites)</div>
-        <div class="site-grid">
-          <div class="site-tag">News Site #1</div>
-          <div class="site-tag">News Site #2</div>
-          <div class="site-tag">News Site #3</div>
-          <div class="site-tag">News Site #4</div>
-          <div class="site-tag">News Site #5</div>
-          <div class="site-tag">News Site #6</div>
-          <div class="site-tag">News Site #7</div>
-          <div class="site-tag">News Site #8</div>
-          <div class="site-tag">News Site #9</div>
-        </div>
-      </div>
-      
-      <div class="category-section">
-        <div class="category-title">🛒 Shopping (8 sites)</div>
-        <div class="site-grid">
-          <div class="site-tag">Shopping Site #1</div>
-          <div class="site-tag">Shopping Site #2</div>
-          <div class="site-tag">Shopping Site #3</div>
-          <div class="site-tag">Shopping Site #4</div>
-          <div class="site-tag">Shopping Site #5</div>
-          <div class="site-tag">Shopping Site #6</div>
-          <div class="site-tag">Shopping Site #7</div>
-          <div class="site-tag">Shopping Site #8</div>
-        </div>
-      </div>
-      
-      <div class="category-section">
-        <div class="category-title">💕 Dating (5 sites)</div>
-        <div class="site-grid">
-          <div class="site-tag">Dating Site #1</div>
-          <div class="site-tag">Dating Site #2</div>
-          <div class="site-tag">Dating Site #3</div>
-          <div class="site-tag">Dating Site #4</div>
-          <div class="site-tag">Dating Site #5</div>
-        </div>
-      </div>
-      
-      <div class="category-section">
-        <div class="category-title">💬 Forums & Communities (4 sites)</div>
-        <div class="site-grid">
-          <div class="site-tag">Forum Site #1</div>
-          <div class="site-tag">Forum Site #2</div>
-          <div class="site-tag">Forum Site #3</div>
-          <div class="site-tag">Forum Site #4</div>
-        </div>
-      </div>
-      
-      <div style="background: #e7f3ff; padding: 16px; border-radius: 12px; margin-top: 20px; font-size: 13px; color: #0c5aa6; line-height: 1.6;">
-        <strong>💡 Note:</strong> Toggle "Block Distracting Sites" to enable/disable all these sites at once. Sites include popular social networks, streaming services, and time-wasting platforms. You can still add custom sites to your permanent block list.
-      </div>
-    </div>
-  </div>
-  
+
+  <!-- Toast Notification -->
+  <div class="toast-msg" id="toastMsg">Changes saved!</div>
+
   <script src="popup.js"></script>
 </body>
 </html>

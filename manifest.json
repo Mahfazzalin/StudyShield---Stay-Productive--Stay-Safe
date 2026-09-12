@@ -1,14 +1,15 @@
 {
   "manifest_version": 3,
   "name": "StudyShield - Stay Productive, Stay Safe",
-  "version": "1.0",
-  "description": "Block distracting websites, set focus timers, and boost productivity. Automatic adult content protection included. Stay focused!",
+  "version": "2.0",
+  "description": "Smart website blocker, Pomodoro focus timer with ambient soundscapes, study streaks, adult content protection, and tamper-proof parental controls.",
   "permissions": [
     "storage",
     "tabs",
     "alarms",
     "notifications",
-    "activeTab"
+    "activeTab",
+    "declarativeNetRequest"
   ],
   "host_permissions": [
     "<all_urls>"
@@ -20,12 +21,14 @@
     "default_popup": "popup.html",
     "default_icon": {
       "16": "icon16.png",
+      "32": "icon32.png",
       "48": "icon48.png",
       "128": "icon128.png"
     }
   },
   "icons": {
     "16": "icon16.png",
+    "32": "icon32.png",
     "48": "icon48.png",
     "128": "icon128.png"
   },
@@ -34,6 +37,12 @@
       "matches": ["<all_urls>"],
       "js": ["content.js"],
       "run_at": "document_start"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["blocked.html", "icon16.png", "icon32.png", "icon48.png", "icon128.png"],
+      "matches": ["<all_urls>"]
     }
   ],
   "content_security_policy": {

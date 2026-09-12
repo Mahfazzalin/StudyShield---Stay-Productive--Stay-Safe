@@ -1,150 +1,123 @@
-// Content script to monitor and block content
+// StudyShield Content Script
+// Active content & search monitoring across web pages and single-page apps (SPAs)
+
 (function() {
   'use strict';
-  
-  // Adult content keywords - ALWAYS ACTIVE
+
+  // Do not run on chrome-extension pages
+  if (window.location.protocol === 'chrome-extension:' || window.location.protocol === 'chrome:') {
+    return;
+  }
+
+  // Adult content keywords (Always active content guard)
   const defaultBlockedKeywords = [
-  '1xbet', 'abuse', 'adult', 'adult ai', 'adult bot', 'adult cam', 'fuck', 'fucking',
-   'adult chat', 'adult dating', 'adult download', 'adult forum', 'adult game', 'adult video',
-    'affair', 'ai girlfriend', 'ai nude', 'alcohol', 'alcohol store', 'anal', 'anal sex', 'bangbros',
-     'bdsm', 'beer', 'bet app', 'bet365', 'betting', 'blackjack', 'blackmail', 'blood', 'blood video',
-      'blowjob', 'bomb', 'bong', 'boobs', 'brazzers', 'breast', 'brothel', 'brothel house', 'bully',
-       'bumble', 'buy cocaine', 'buy heroin', 'buy weed', 'cam show', 'camgirl', 'cannabis',
-        'casino', 'chat sex', 'cocaine', 'cocaine delivery', 'condom', 'credit card fraud',
-         'crime', 'cumshot', 'curse', 'cybercrime', 'dark market', 'darkweb', 'dating', 
-         'death', 'deepfake', 'deepweb', 'drug', 'drug dealer', 'drug dealing', 'drug party',
-          'drug shop', 'drugs online', 'ecstasy', 'erotic', 'erotic chat', 'erotic dance',
-           'erotic story', 'erotic video', 'escort', 'escort service', 'explicit',
-            'extreme sex', 'fetish', 'fetish porn', 'fight', 'fight club', 'fraud', 'gamble', 'gay porn', 'gay video', 'gaysex', 'grindr', 'group sex', 'gun', 'guns for sale', 'hack', 'hang', 'hardcore', 'hate', 'hentai', 'hentai video', 'heroin', 'hitman', 'hooker', 'hookup', 'hot video', 'human trafficking', 'illegal', 'illegal drugs', 'incest', 'incest story', 'intercourse', 'isis', 'jackpot', 'joint', 'kill', 'kill myself', 'kiss', 'knife', 'lap dance', 'lesbian', 'lesbian video', 'live sex', 'lottery', 'lust', 'lustful', 'malware', 'marijuana', 'masturbate', 'meth', 'milf', 'murder', 'murder plan', 'naked', 'naked boy', 'naked girl', 'narcotic', 'naughty america', 'nazi', 'night club', 'nsfw', 'nude', 'nude ai', 'nude chat', 'nude photo', 'one night stand', 'online casino', 'online scam', 'onlyfans', 'orgasm', 'paid dating', 'penis', 'phishing', 'playboy', 'poker', 'porn', 'porn download', 'porn film', 'porn hub', 'porn site', 'porn video', 'private chat', 'prostitute', 'prostitution', 'racist', 'ransomware', 'rape', 'rave party', 'red light area', 'redtube', 'revenge porn', 'roulette', 'scam', 'secret affair', 'seduce', 'seduction', 'self harm', 'sex', 'sex ai', 'sex chat', 'sex game', 'sex movie', 'sex story', 'sext', 'sexting', 'shemale', 'shoot', 'slave', 'smoke', 'smoke shop', 'softcore', 'sports betting', 'stolen', 'stolen data', 'strip club', 'strip show', 'stripper', 'sugar baby', 'sugar daddy', 'sugar dating', 'suicide', 'suicide plan', 'taboo', 'teen porn', 'terrorist', 'threesome', 'tinder', 'torture', 'torture video', 'trans porn', 'vagina', 'vape', 'vape shop', 'video chat', 'violence', 'vodka', 'vodka shop', 'voyeur', 'war', 'war video', 'weapon', 'webcam', 'webcam chat', 'webcam show', 'weed', 'weed delivery', 'whiskey', 'whiskey shop', 'wine', 'xnxx', 'xvideos', 'xxx', 'youporn'
+    'pornhub', 'xvideos', 'xnxx', 'redtube', 'youporn', 'xhamster', 'spankbang',
+    'eporner', 'onlyfans', 'fansly', 'chaturbate', 'livejasmin', 'stripchat',
+    'hentai', 'deepfake nude', 'erotic video', 'hardcore sex', 'camgirl live',
+    'escort service', 'sugar baby dating', 'free porn', 'xxx videos', 'sex webcam'
   ];
 
+  function checkPageSafety() {
+    try {
+      chrome.storage.local.get([
+        'focusMode',
+        'allowedWebsites',
+        'permanentBlocked',
+        'blockedKeywords',
+        'usePrelistedSites',
+        'adultShieldEnabled'
+      ], (data) => {
+        if (chrome.runtime.lastError) return;
 
-  
-  // Adult content domains - ALWAYS ACTIVE
-  const defaultBlockedDomains = [
-    'pornhub.com', 'xvideos.com', 'xnxx.com', 'redtube.com',
-    'youporn.com', 'xhamster.com', 'porn.com', 'tube8.com',
-    'spankbang.com', 'eporner.com', 'txxx.com', 'hqporner.com',
-    'xnxx.tv', 'beeg.com', 'porntrex.com', 'tnaflix.com',
-    'youjizz.com', 'drtuber.com', 'nuvid.com', 'motherless.com',
-    'upornia.com', '4tube.com', 'ixxx.com', 'sunporno.com',
-    'alphaporno.com', 'cam4.com', 'chaturbate.com',
-    'livejasmin.com', 'bongacams.com', 'stripchat.com', 'camsoda.com',
-    'onlyfans.com', 'fansly.com', 'justforfans.com', 'pornhd.com',
-    'empflix.com', 'porndig.com', 'fapality.com'
-  ];
-  
-  // Check current page
-  function checkCurrentPage() {
-    chrome.storage.local.get([
-      'focusMode',
-      'allowedWebsites',
-      'permanentBlocked',
-      'blockedKeywords',
-      'usePrelistedSites'
-    ], (data) => {
-      const currentUrl = window.location.href;
-      const currentDomain = window.location.hostname.replace('www.', '');
-      
-      // ALWAYS CHECK ADULT CONTENT FIRST (regardless of any settings)
-      // Check adult domains
-      for (let domain of defaultBlockedDomains) {
-        if (currentDomain.includes(domain) || domain.includes(currentDomain)) {
-          blockPage('content_filter');
-          return;
+        const currentUrl = window.location.href.toLowerCase();
+        const currentDomain = window.location.hostname.replace('www.', '').toLowerCase();
+
+        // 1. Check Adult Keyword in URL or Page Title if adult shield is active
+        if (data.adultShieldEnabled !== false) {
+          const pageTitle = (document.title || '').toLowerCase();
+          for (let kw of defaultBlockedKeywords) {
+            if (currentUrl.includes(kw) || pageTitle.includes(kw)) {
+              blockCurrentPage('content_filter', kw);
+              return;
+            }
+          }
         }
-      }
-      
-      // Check for adult content keywords in URL
-      const urlLower = currentUrl.toLowerCase();
-      for (let keyword of defaultBlockedKeywords) {
-        if (urlLower.includes(keyword)) {
-          blockPage('content_filter');
-          return;
+
+        // 2. Check Custom User Blocked Keywords
+        const userKeywords = data.blockedKeywords || [];
+        const pageTitle = (document.title || '').toLowerCase();
+        for (let kw of userKeywords) {
+          const cleanKw = kw.toLowerCase().trim();
+          if (cleanKw && (currentUrl.includes(cleanKw) || pageTitle.includes(cleanKw))) {
+            blockCurrentPage('keyword_filter', cleanKw);
+            return;
+          }
         }
-      }
-      
-      // Check user keywords
-      const userKeywords = data.blockedKeywords || [];
-      for (let keyword of userKeywords) {
-        if (urlLower.includes(keyword.toLowerCase())) {
-          blockPage('keyword_filter');
-          return;
+
+        // 3. Check Focus Mode (Allowed Sites Only)
+        if (data.focusMode) {
+          const allowedList = data.allowedWebsites || [];
+          const isAllowed = allowedList.some(site => {
+            const clean = site.replace(/^https?:\/\//i, '').replace('www.', '').toLowerCase();
+            return currentDomain === clean || currentDomain.endsWith('.' + clean);
+          });
+
+          if (!isAllowed) {
+            blockCurrentPage('focus_mode', currentDomain);
+            return;
+          }
         }
-      }
-      
-      // Check focus mode
-      if (data.focusMode) {
-        const allowedWebsites = data.allowedWebsites || [];
-        const isAllowed = allowedWebsites.some(site => {
-          const cleanSite = site.replace('www.', '').toLowerCase();
-          return currentDomain.includes(cleanSite) || cleanSite.includes(currentDomain);
+
+        // 4. Check Permanent Blocked List
+        const permanentBlocked = data.permanentBlocked || [];
+        const isBlocked = permanentBlocked.some(site => {
+          const clean = site.replace(/^https?:\/\//i, '').replace('www.', '').toLowerCase();
+          return currentDomain === clean || currentDomain.endsWith('.' + clean);
         });
-        
-        if (!isAllowed) {
-          blockPage('focus_mode');
+
+        if (isBlocked) {
+          blockCurrentPage('permanent_block', currentDomain);
           return;
         }
-      }
-      
-      // Check prelisted sites
-      if (data.usePrelistedSites) {
-        // List of prelisted distracting sites
-        const prelistedSites = [
-          'snapchat.com', 'pinterest.com', 'linkedin.com', 'tumblr.com',
-          'netflix.com', 'hulu.com', 'twitch.tv', 'vimeo.com',
-          'dailymotion.com', 'disneyplus.com', 'hbomax.com', 'primevideo.com',
-          'steam.com', 'epicgames.com', 'roblox.com', 'minecraft.net',
-          'leagueoflegends.com', 'fortnite.com', 'playstation.com', 'xbox.com',
-          'buzzfeed.com', 'cnn.com', 'bbc.com', 'espn.com', 'ign.com',
-          'kotaku.com', 'polygon.com', 'theverge.com', 'mashable.com',
-          'amazon.com', 'ebay.com', 'etsy.com', 'aliexpress.com', 'wish.com',
-          'target.com', 'walmart.com', 'bestbuy.com',
-          'tinder.com', 'bumble.com', 'match.com', 'okcupid.com', 'hinge.co',
-          '4chan.org', '9gag.com', 'imgur.com', 'quora.com'
-        ];
-        
-        const isPrelistedBlocked = prelistedSites.some(site => {
-          const cleanSite = site.replace('www.', '').toLowerCase();
-          return currentDomain.includes(cleanSite) || cleanSite.includes(currentDomain);
-        });
-        
-        if (isPrelistedBlocked) {
-          blockPage('prelisted_block');
-          return;
-        }
-      }
-      
-      // Check permanent blocks
-      const permanentBlocked = data.permanentBlocked || [];
-      const isBlocked = permanentBlocked.some(site => {
-        const cleanSite = site.replace('www.', '').toLowerCase();
-        return currentDomain.includes(cleanSite) || cleanSite.includes(currentDomain);
       });
-      
-      if (isBlocked) {
-        blockPage('permanent_block');
-        return;
+    } catch (e) {
+      // Storage access or context invalidated
+    }
+  }
+
+  function blockCurrentPage(reason, target) {
+    try {
+      window.location.replace(
+        chrome.runtime.getURL(`blocked.html?reason=${reason}&domain=${encodeURIComponent(target || window.location.hostname)}`)
+      );
+    } catch (e) {
+      // Fallback
+      window.location.href = chrome.runtime.getURL('blocked.html?reason=' + reason);
+    }
+  }
+
+  // Initial check
+  checkPageSafety();
+
+  // Handle SPA navigation (YouTube, Twitter/X, etc.)
+  let lastUrl = window.location.href;
+  const observer = new MutationObserver(() => {
+    if (window.location.href !== lastUrl) {
+      lastUrl = window.location.href;
+      checkPageSafety();
+    }
+  });
+
+  if (document.body) {
+    observer.observe(document.body, { childList: true, subtree: true });
+  } else {
+    document.addEventListener('DOMContentLoaded', () => {
+      checkPageSafety();
+      if (document.body) {
+        observer.observe(document.body, { childList: true, subtree: true });
       }
     });
   }
-  
-  function blockPage(reason) {
-    // Redirect to blocked page
-    window.location.href = chrome.runtime.getURL('blocked.html') + '?reason=' + reason;
-  }
-  
-  // Check on load
-  checkCurrentPage();
-  
-  // Monitor for dynamic URL changes
-  let lastUrl = window.location.href;
-  new MutationObserver(() => {
-    const currentUrl = window.location.href;
-    if (currentUrl !== lastUrl) {
-      lastUrl = currentUrl;
-      checkCurrentPage();
-    }
-  }).observe(document, { subtree: true, childList: true });
-  
+
+  window.addEventListener('popstate', checkPageSafety);
 })();

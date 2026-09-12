@@ -1,0 +1,18 @@
+Windows Registry Editor Version 5.00
+
+; ==============================================================================
+; StudyShield - 1-Click Anti-Uninstall Fortress Mode (Parental Protection)
+; This registry policy force-installs and locks StudyShield in Google Chrome.
+; Result: Children cannot uninstall, remove, or disable the extension.
+; "Remove from Chrome" button is completely disabled by Chrome enterprise policy.
+; ==============================================================================
+
+[HKEY_CURRENT_USER\Software\Policies\Google\Chrome]
+
+[HKEY_CURRENT_USER\Software\Policies\Google\Chrome\ExtensionInstallForcelist]
+"101"="StudyShield;https://clients2.google.com/service/update2/crx"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Google\Chrome]
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Google\Chrome\ExtensionInstallForcelist]
+"101"="StudyShield;https://clients2.google.com/service/update2/crx"

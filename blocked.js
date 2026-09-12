@@ -1,96 +1,138 @@
-// Motivational quotes for focus mode
-const motivationalQuotes = [
-  "Focus is the art of knowing what to ignore.",
-  "You can't build a reputation on what you're going to do.",
-  "The successful warrior is the average person, with laser-like focus.",
-  "Where focus goes, energy flows.",
-  "Concentrate all your thoughts upon the work at hand.",
-  "Stay focused, go after your dreams and keep moving toward your goals.",
-  "Focus on being productive instead of busy.",
-  "The key to success is to focus our conscious mind on things we desire.",
-  "Your focus determines your reality.",
-  "Lack of direction, not lack of time, is the problem."
+// StudyShield Blocked Guardian Screen Script
+
+const quotes = [
+  { text: "Concentrate all your thoughts upon the work in hand. The sun's rays do not burn until brought to a focus.", author: "Alexander Graham Bell" },
+  { text: "Starve your distractions, feed your focus.", author: "Daniel Goleman" },
+  { text: "You will never reach your destination if you stop and throw stones at every dog that barks.", author: "Winston Churchill" },
+  { text: "Your future is created by what you do today, not tomorrow.", author: "Robert Kiyosaki" },
+  { text: "Deep work is the ability to focus without distraction on a cognitively demanding task.", author: "Cal Newport" },
+  { text: "Do not wait to strike till the iron is hot; but make it hot by striking.", author: "William Butler Yeats" },
+  { text: "Discipline is choosing between what you want now and what you want most.", author: "Abraham Lincoln" }
 ];
 
-// Get block reason from URL
-const urlParams = new URLSearchParams(window.location.search);
-const reason = urlParams.get('reason');
+document.addEventListener('DOMContentLoaded', () => {
+  const params = new URLSearchParams(window.location.search);
+  const reason = params.get('reason') || 'site_blocked';
+  const domain = params.get('domain') || '';
+  const keyword = params.get('keyword') || '';
 
-const reasonElement = document.getElementById('reason');
-const messageElement = document.getElementById('message');
-const quoteElement = document.getElementById('quote');
-const quoteTextElement = document.getElementById('quoteText');
+  const badgeText = document.getElementById('badgeText');
+  const headline = document.getElementById('headline');
+  const subtext = document.getElementById('subtext');
+  const blockedTarget = document.getElementById('blockedTarget');
+  const statusIcon = document.getElementById('statusIcon');
 
-// Set content based on reason
-switch(reason) {
-  case 'focus_mode':
-    reasonElement.textContent = '🎯 Focus Mode is active. Only allowed websites can be accessed during your focus session.';
-    messageElement.textContent = 'Stay focused on your goals!';
-    showTimer();
-    showMotivationalQuote();
-    break;
-  case 'prelisted_block':
-    reasonElement.textContent = '📋 This website is on the prelisted distracting sites list.';
-    messageElement.textContent = 'Stay productive!';
-    showMotivationalQuote();
-    break;
-  case 'permanent_block':
-    reasonElement.textContent = '🚫 This website is in your permanently blocked list.';
-    messageElement.textContent = 'Stay on track!';
-    showMotivationalQuote();
-    break;
-  case 'content_filter':
-    reasonElement.textContent = '🛡️ This content has been filtered for your safety and wellbeing.';
-    messageElement.textContent = 'Protected by content filter';
-    break;
-  case 'keyword_filter':
-    reasonElement.textContent = '🔍 This search contains blocked keywords.';
-    messageElement.textContent = 'Try searching for something else';
-    break;
-  default:
-    reasonElement.textContent = '⛔ This website is currently blocked.';
-    messageElement.textContent = 'Blocked by Focus Timer';
-}
+  // Display target info
+  if (domain) {
+    blockedTarget.textContent = '🌐 ' + domain;
+  } else if (keyword) {
+    blockedTarget.textContent = '🔍 Keyword: ' + keyword;
+  } else {
+    blockedTarget.style.display = 'none';
+  }
 
-// Show motivational quote
-function showMotivationalQuote() {
-  const randomQuote = motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)];
-  quoteTextElement.textContent = randomQuote;
-  quoteElement.style.display = 'block';
-}
+  // Customize UI based on reason
+  switch (reason) {
+    case 'content_filter':
+      badgeText.className = 'badge badge-danger';
+      badgeText.textContent = '🛡️ Content Safety Filter';
+      headline.textContent = 'Unsafe Content Filtered';
+      subtext.textContent = 'This website or search was automatically filtered to keep your digital space safe, healthy, and focused.';
+      statusIcon.textContent = '🛡️';
+      break;
 
-// Show timer for focus mode
-function showTimer() {
-  const timerContainer = document.getElementById('timerContainer');
-  const timerElement = document.getElementById('timer');
-  timerContainer.style.display = 'block';
-  
-  function updateTimer() {
-    chrome.storage.local.get(['timerEndTime'], (data) => {
-      if (data.timerEndTime) {
-        const remaining = Math.max(0, data.timerEndTime - Date.now());
-        const minutes = Math.floor(remaining / 60000);
-        const seconds = Math.floor((remaining % 60000) / 1000);
-        
-        timerElement.textContent = 
-          `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-        
-        if (remaining > 0) {
-          setTimeout(updateTimer, 1000);
+    case 'keyword_filter':
+      badgeText.className = 'badge badge-danger';
+      badgeText.textContent = '🔍 Restricted Search';
+      headline.textContent = 'Restricted Search Query';
+      subtext.textContent = 'This search contains blocked keywords and cannot be displayed.';
+      statusIcon.textContent = '🚫';
+      break;
+
+    case 'focus_mode':
+      badgeText.className = 'badge badge-focus';
+      badgeText.textContent = '🎯 Focus Mode Active';
+      headline.textContent = 'Laser Focus In Progress';
+      subtext.textContent = 'Only allowed educational sites are unlocked during your study session. Stay in the zone!';
+      statusIcon.textContent = '⏱️';
+      break;
+
+    case 'tamper_shield':
+      badgeText.className = 'badge badge-danger';
+      badgeText.textContent = '🔒 Parental Tamper Lock';
+      headline.textContent = 'Settings Locked by Parent';
+      subtext.textContent = 'Browser extensions and system settings are strictly protected by Parent PIN and cannot be altered.';
+      statusIcon.textContent = '🔐';
+      document.getElementById('parentOverrideBtn').style.display = 'none';
+      break;
+
+    default:
+      badgeText.className = 'badge badge-shield';
+      badgeText.textContent = '🚫 Distraction Blocked';
+      headline.textContent = 'Time to Get Back to Work';
+      subtext.textContent = 'This distracting website is locked during study hours so you can achieve your daily learning goals.';
+      statusIcon.textContent = '📚';
+  }
+
+  // Set random quote
+  const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+  document.getElementById('quoteContent').textContent = `"${randomQuote.text}"`;
+  document.getElementById('quoteAuthor').textContent = `— ${randomQuote.author}`;
+
+  // Button actions
+  document.getElementById('returnBtn').addEventListener('click', () => {
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      window.location.href = 'https://google.com';
+    }
+  });
+
+  // Parent PIN Override Modal
+  const pinModal = document.getElementById('pinModal');
+  const parentOverrideBtn = document.getElementById('parentOverrideBtn');
+  const cancelPinBtn = document.getElementById('cancelPinBtn');
+  const confirmPinBtn = document.getElementById('confirmPinBtn');
+  const parentPinInput = document.getElementById('parentPinInput');
+  const pinError = document.getElementById('pinError');
+
+  parentOverrideBtn.addEventListener('click', () => {
+    pinModal.classList.add('active');
+    parentPinInput.value = '';
+    pinError.style.display = 'none';
+    parentPinInput.focus();
+  });
+
+  cancelPinBtn.addEventListener('click', () => {
+    pinModal.classList.remove('active');
+  });
+
+  confirmPinBtn.addEventListener('click', handlePinSubmit);
+  parentPinInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') handlePinSubmit();
+  });
+
+  async function handlePinSubmit() {
+    const enteredPin = parentPinInput.value.trim();
+    if (!enteredPin) return;
+
+    chrome.runtime.sendMessage({ action: 'verifyPin', pin: enteredPin }, (response) => {
+      if (response && response.valid) {
+        // Unlock domain for 10 minutes
+        if (domain) {
+          chrome.runtime.sendMessage({ action: 'tempOverride', domain }, () => {
+            pinModal.classList.remove('active');
+            window.location.href = `https://${domain}`;
+          });
         } else {
-          timerElement.textContent = 'Session Complete!';
-          setTimeout(() => {
-            window.location.reload();
-          }, 2000);
+          pinModal.classList.remove('active');
+          window.history.back();
         }
+      } else {
+        pinError.style.display = 'block';
+        parentPinInput.value = '';
+        parentPinInput.focus();
       }
     });
   }
-  
-  updateTimer();
-}
-
-// Event listeners (no inline handlers)
-document.getElementById('goBackBtn').addEventListener('click', () => {
-  window.history.back();
 });

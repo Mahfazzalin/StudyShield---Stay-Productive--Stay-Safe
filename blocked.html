@@ -1,406 +1,370 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Website Blocked</title>
+  <title>StudyShield - Protected & Focused</title>
   <style>
+    :root {
+      --bg-primary: #0a0f1d;
+      --card-bg: rgba(18, 26, 47, 0.85);
+      --card-border: rgba(99, 102, 241, 0.25);
+      --accent-indigo: #6366f1;
+      --accent-purple: #8b5cf6;
+      --accent-cyan: #06b6d4;
+      --accent-emerald: #10b981;
+      --accent-rose: #f43f5e;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
     }
-    
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      background: radial-gradient(circle at top center, #1e1b4b 0%, #0a0f1d 70%, #030712 100%);
+      color: var(--text-main);
       min-height: 100vh;
-      padding: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
       position: relative;
-      overflow: hidden;
+      overflow-x: hidden;
     }
-    
-    /* Animated background circles */
-    .bg-circle {
+
+    /* Ambient background glows */
+    .glow-sphere-1 {
       position: absolute;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.1);
-      animation: float 20s infinite;
+      top: -100px;
+      left: -100px;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.25) 0%, transparent 70%);
+      filter: blur(50px);
+      pointer-events: none;
+      animation: pulseGlow 12s infinite alternate;
     }
-    
-    .bg-circle:nth-child(1) {
-      width: 300px;
-      height: 300px;
-      top: -150px;
-      left: -150px;
-      animation-delay: 0s;
-    }
-    
-    .bg-circle:nth-child(2) {
-      width: 200px;
-      height: 200px;
-      bottom: -100px;
+
+    .glow-sphere-2 {
+      position: absolute;
+      bottom: -150px;
       right: -100px;
-      animation-delay: 7s;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(236, 72, 153, 0.18) 0%, transparent 70%);
+      filter: blur(60px);
+      pointer-events: none;
+      animation: pulseGlow 14s infinite alternate-reverse;
     }
-    
-    .bg-circle:nth-child(3) {
-      width: 150px;
-      height: 150px;
-      top: 50%;
-      left: 10%;
-      animation-delay: 14s;
+
+    @keyframes pulseGlow {
+      0% { transform: scale(1); opacity: 0.7; }
+      100% { transform: scale(1.2); opacity: 1; }
     }
-    
-    @keyframes float {
-      0%, 100% { transform: translateY(0) scale(1); }
-      50% { transform: translateY(-30px) scale(1.1); }
-    }
-    
+
     .container {
-      background: white;
-      border-radius: 24px;
-      padding: 40px 30px;
-      max-width: 600px;
+      background: var(--card-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--card-border);
+      border-radius: 28px;
+      padding: 44px 36px;
+      max-width: 580px;
       width: 100%;
       text-align: center;
-      box-shadow: 0 25px 70px rgba(0,0,0,0.3);
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7), 0 0 40px rgba(99, 102, 241, 0.15);
       position: relative;
-      z-index: 1;
-      animation: slideUp 0.5s ease-out;
+      z-index: 10;
+      animation: slideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    
-    @keyframes slideUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(24px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
     }
-    
-    .icon-container {
-      width: 100px;
-      height: 100px;
-      margin: 0 auto 24px;
-      background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
-      border-radius: 50%;
+
+    /* Zen Breathing Circle */
+    .zen-container {
+      margin: 0 auto 28px;
+      width: 120px;
+      height: 120px;
+      position: relative;
       display: flex;
       align-items: center;
       justify-content: center;
-      animation: pulse 2s infinite;
     }
-    
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.05); }
+
+    .zen-circle-outer {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(168, 85, 247, 0.3));
+      animation: breathe 8s infinite ease-in-out;
     }
-    
-    .icon {
-      font-size: 50px;
+
+    .zen-circle-inner {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 34px;
+      box-shadow: 0 10px 30px rgba(99, 102, 241, 0.5);
+      position: relative;
+      z-index: 2;
     }
-    
-    h1 {
-      font-size: 28px;
-      color: #1f2937;
-      margin-bottom: 12px;
-      font-weight: 700;
+
+    @keyframes breathe {
+      0%, 100% { transform: scale(0.85); opacity: 0.4; }
+      50% { transform: scale(1.25); opacity: 0.85; }
     }
-    
-    .subtitle {
-      font-size: 16px;
-      color: #6b7280;
-      line-height: 1.6;
-      margin-bottom: 24px;
-      font-weight: 500;
-    }
-    
-    .reason-box {
-      background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
-      padding: 16px 20px;
-      border-radius: 16px;
-      font-size: 14px;
-      color: #374151;
-      margin-bottom: 24px;
-      border-left: 4px solid #667eea;
-      text-align: left;
-      font-weight: 500;
-      line-height: 1.6;
-    }
-    
-    .timer-container {
-      margin: 24px 0;
-    }
-    
-    .timer-label {
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 20px;
       font-size: 13px;
-      color: #6b7280;
-      margin-bottom: 10px;
       font-weight: 600;
+      letter-spacing: 0.5px;
+      margin-bottom: 16px;
+    }
+
+    .badge-shield {
+      background: rgba(99, 102, 241, 0.15);
+      color: #818cf8;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+    }
+
+    .badge-danger {
+      background: rgba(244, 63, 94, 0.15);
+      color: #fb7185;
+      border: 1px solid rgba(244, 63, 94, 0.3);
+    }
+
+    .badge-focus {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    h1 {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    p.subtitle {
+      color: var(--text-muted);
+      font-size: 15px;
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+
+    /* Target URL or reason tag */
+    .blocked-target {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 10px 16px;
+      font-family: monospace;
+      font-size: 14px;
+      color: #38bdf8;
+      display: inline-block;
+      margin-bottom: 24px;
+      word-break: break-all;
+    }
+
+    /* Quote Box */
+    .quote-card {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(139, 92, 246, 0.04) 100%);
+      border: 1px dashed rgba(99, 102, 241, 0.25);
+      border-radius: 16px;
+      padding: 18px 20px;
+      margin-bottom: 28px;
+      font-style: italic;
+      color: #e2e8f0;
+      font-size: 14px;
+      line-height: 1.6;
+      position: relative;
+    }
+
+    .quote-author {
+      margin-top: 8px;
+      font-style: normal;
+      font-size: 12px;
+      color: var(--text-muted);
       text-transform: uppercase;
       letter-spacing: 1px;
     }
-    
-    .timer {
-      font-size: 48px;
-      font-weight: 700;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      font-variant-numeric: tabular-nums;
-      letter-spacing: 2px;
-    }
-    
-    .buttons {
+
+    /* Action Buttons */
+    .actions {
       display: flex;
+      flex-direction: column;
       gap: 12px;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-top: 24px;
     }
-    
-    .btn {
-      padding: 14px 28px;
+
+    .btn-primary {
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      color: white;
       border: none;
+      padding: 14px 24px;
       border-radius: 14px;
       font-size: 15px;
-      font-weight: 600;
+      font-weight: 700;
       cursor: pointer;
-      transition: all 0.3s;
+      transition: all 0.25s ease;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
-      text-decoration: none;
-      flex: 1;
-      min-width: 140px;
+      box-shadow: 0 8px 20px -4px rgba(99, 102, 241, 0.4);
     }
-    
-    .btn-primary {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      box-shadow: 0 4px 14px rgba(102, 126, 234, 0.4);
-    }
-    
+
     .btn-primary:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.5);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px -4px rgba(99, 102, 241, 0.6);
     }
-    
-    .btn-primary:active {
-      transform: translateY(-1px);
-    }
-    
-    .motivational-quote {
-      margin-top: 24px;
-      padding: 16px 20px;
-      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--text-muted);
+      padding: 12px 20px;
       border-radius: 14px;
       font-size: 14px;
-      color: #92400e;
       font-weight: 600;
-      font-style: italic;
-      line-height: 1.6;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
-    
-    .quote-icon {
-      font-size: 22px;
-      margin-bottom: 6px;
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-main);
     }
-    
-    /* Tablet styles */
-    @media (max-width: 768px) {
-      body {
-        padding: 12px;
-      }
-      
-      .container {
-        padding: 32px 24px;
-        border-radius: 20px;
-      }
-      
-      .icon-container {
-        width: 90px;
-        height: 90px;
-      }
-      
-      .icon {
-        font-size: 45px;
-      }
-      
-      h1 {
-        font-size: 24px;
-      }
-      
-      .subtitle {
-        font-size: 15px;
-      }
-      
-      .reason-box {
-        padding: 14px 16px;
-        font-size: 13px;
-      }
-      
-      .timer {
-        font-size: 42px;
-      }
-      
-      .btn {
-        padding: 12px 24px;
-        font-size: 14px;
-        min-width: 120px;
-      }
-      
-      .motivational-quote {
-        font-size: 13px;
-        padding: 14px 16px;
-      }
+
+    /* Parent Override Modal */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(3, 7, 18, 0.8);
+      backdrop-filter: blur(8px);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
     }
-    
-    /* Mobile styles */
-    @media (max-width: 480px) {
-      body {
-        padding: 10px;
-      }
-      
-      .bg-circle {
-        display: none; /* Hide animated circles on mobile for performance */
-      }
-      
-      .container {
-        padding: 28px 20px;
-        border-radius: 18px;
-      }
-      
-      .icon-container {
-        width: 80px;
-        height: 80px;
-        margin-bottom: 20px;
-      }
-      
-      .icon {
-        font-size: 40px;
-      }
-      
-      h1 {
-        font-size: 22px;
-        margin-bottom: 10px;
-      }
-      
-      .subtitle {
-        font-size: 14px;
-        margin-bottom: 20px;
-      }
-      
-      .reason-box {
-        padding: 12px 14px;
-        font-size: 12px;
-        margin-bottom: 20px;
-        border-radius: 12px;
-      }
-      
-      .timer-container {
-        margin: 20px 0;
-      }
-      
-      .timer-label {
-        font-size: 12px;
-        margin-bottom: 8px;
-      }
-      
-      .timer {
-        font-size: 36px;
-        letter-spacing: 1px;
-      }
-      
-      .buttons {
-        flex-direction: column;
-        gap: 10px;
-      }
-      
-      .btn {
-        width: 100%;
-        padding: 12px 20px;
-        font-size: 14px;
-        min-width: unset;
-      }
-      
-      .motivational-quote {
-        font-size: 12px;
-        padding: 12px 14px;
-        margin-top: 20px;
-        border-radius: 12px;
-      }
-      
-      .quote-icon {
-        font-size: 20px;
-        margin-bottom: 4px;
-      }
+
+    .modal-backdrop.active {
+      display: flex;
     }
-    
-    /* Extra small mobile */
-    @media (max-width: 360px) {
-      .container {
-        padding: 24px 16px;
-      }
-      
-      h1 {
-        font-size: 20px;
-      }
-      
-      .subtitle {
-        font-size: 13px;
-      }
-      
-      .timer {
-        font-size: 32px;
-      }
-      
-      .btn {
-        padding: 11px 18px;
-        font-size: 13px;
-      }
+
+    .modal-box {
+      background: #111827;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      border-radius: 20px;
+      padding: 28px;
+      max-width: 380px;
+      width: 100%;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+      text-align: center;
+    }
+
+    .pin-input {
+      width: 100%;
+      background: #1f2937;
+      border: 1.5px solid #374151;
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 24px;
+      color: white;
+      text-align: center;
+      letter-spacing: 8px;
+      margin: 18px 0;
+      outline: none;
+    }
+
+    .pin-input:focus {
+      border-color: var(--accent-indigo);
+      box-shadow: 0 0 12px rgba(99, 102, 241, 0.3);
+    }
+
+    .error-text {
+      color: var(--accent-rose);
+      font-size: 13px;
+      margin-top: -10px;
+      margin-bottom: 12px;
+      display: none;
     }
   </style>
 </head>
 <body>
-  <div class="bg-circle"></div>
-  <div class="bg-circle"></div>
-  <div class="bg-circle"></div>
-  
+  <div class="glow-sphere-1"></div>
+  <div class="glow-sphere-2"></div>
+
   <div class="container">
-    <div class="icon-container">
-      <div class="icon">🚫</div>
+    <div class="zen-container">
+      <div class="zen-circle-outer"></div>
+      <div class="zen-circle-inner" id="statusIcon">🛡️</div>
     </div>
-    
-    <h1>Website Blocked</h1>
-    <p class="subtitle" id="message">This website has been blocked by Focus Timer & Blocker.</p>
-    
-    <div class="reason-box" id="reason"></div>
-    
-    <div class="timer-container" id="timerContainer" style="display: none;">
-      <div class="timer-label">Time Remaining</div>
-      <div class="timer" id="timer">00:00</div>
+
+    <div class="badge badge-shield" id="badgeText">🛡️ StudyShield Active</div>
+    <h1 id="headline">Stay Focused, Stay Safe</h1>
+    <p class="subtitle" id="subtext">This website was paused to protect your study time and keep distractions away.</p>
+
+    <div class="blocked-target" id="blockedTarget">website.com</div>
+
+    <div class="quote-card">
+      <div id="quoteContent">"Concentrate all your thoughts upon the work in hand. The sun's rays do not burn until brought to a focus."</div>
+      <div class="quote-author" id="quoteAuthor">— Alexander Graham Bell</div>
     </div>
-    
-    <div class="motivational-quote" id="quote" style="display: none;">
-      <div class="quote-icon">💡</div>
-      <div id="quoteText"></div>
-    </div>
-    
-    <div class="buttons">
-      <button class="btn btn-primary" id="goBackBtn">
-        <span>←</span> Go Back
+
+    <div class="actions">
+      <button class="btn-primary" id="returnBtn">
+        <span>🚀 Return to Studies</span>
+      </button>
+      <button class="btn-secondary" id="parentOverrideBtn">
+        <span>🔑 Parent Override (PIN Required)</span>
       </button>
     </div>
   </div>
-  
+
+  <!-- Parent PIN Modal -->
+  <div class="modal-backdrop" id="pinModal">
+    <div class="modal-box">
+      <div style="font-size: 32px; margin-bottom: 8px;">👨‍👩‍👧</div>
+      <h3 style="font-size: 18px; margin-bottom: 6px;">Parent Access</h3>
+      <p style="font-size: 13px; color: var(--text-muted);">Enter your 4-digit Parent PIN to grant a 10-minute temporary study pass.</p>
+
+      <input type="password" maxlength="6" class="pin-input" id="parentPinInput" placeholder="••••" autofocus>
+      <div class="error-text" id="pinError">Incorrect PIN. Please try again.</div>
+
+      <div style="display: flex; gap: 10px;">
+        <button class="btn-secondary" id="cancelPinBtn" style="flex: 1;">Cancel</button>
+        <button class="btn-primary" id="confirmPinBtn" style="flex: 1;">Unlock</button>
+      </div>
+    </div>
+  </div>
+
   <script src="blocked.js"></script>
 </body>
 </html>

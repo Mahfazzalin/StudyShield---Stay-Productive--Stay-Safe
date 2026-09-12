@@ -1,0 +1,12 @@
+Windows Registry Editor Version 5.00
+
+; ==============================================================================
+; StudyShield - Fortress Mode Unlock (Parental Restore)
+; Removes the enterprise force-install lock, allowing normal extension management.
+; ==============================================================================
+
+[HKEY_CURRENT_USER\Software\Policies\Google\Chrome\ExtensionInstallForcelist]
+"101"=-
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Google\Chrome\ExtensionInstallForcelist]
+"101"=-
